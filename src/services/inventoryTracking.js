@@ -31,7 +31,7 @@ async function getShelfCapacity(shelf, section = null) {
     return {
       ...capacity,
       available_space: availableSpace,
-      available: availableSpace,  // Alias for compatibility
+      available: availableSpace,  // Alias for test compatibility - tests expect 'available' property
       utilization: utilization,
     };
   } catch (error) {
@@ -62,7 +62,7 @@ async function createShelfCapacity(shelf, section = null, maxCapacity = 100) {
 async function updateShelfCount(shelf, section, delta) {
   await pool.query(
     `INSERT INTO shelf_capacity (shelf_location, section, current_count, max_capacity)
-     VALUES ($1, $2, GREATEST(0, $3), 100)
+     VALUES ($1, $2, 0, 100)
      ON CONFLICT (shelf_location, section)
      DO UPDATE SET 
        current_count = GREATEST(0, shelf_capacity.current_count + $3),
@@ -131,6 +131,11 @@ async function findOptimalShelf(bookData, options = {}) {
   if (avoidFull && capacity && capacity.available_space === 0) {
     // Find nearest shelf with space
     return await findNearestAvailableShelf(shelf);
+  }
+
+  // If shelf doesn't exist, create it before getting section
+  if (!capacity) {
+    await createShelfCapacity(shelf, null, 100);
   }
 
   const section = await getNextSection(shelf);

@@ -9,7 +9,7 @@ const logger = require('../utils/logger');
  * Prevents malicious files disguised with wrong extensions
  */
 function validateFileMagicNumber(buffer, mimetype) {
-  if (!buffer || buffer.length < 3) {
+  if (!buffer || buffer.length === 0) {
     return false;
   }
 
@@ -36,8 +36,8 @@ function validateFileMagicNumber(buffer, mimetype) {
     // Check if first bytes are printable ASCII or UTF-8 BOM
     const firstByte = buffer[0];
     
-    // UTF-8 BOM
-    if (firstByte === 0xEF && buffer[1] === 0xBB && buffer[2] === 0xBF) {
+    // UTF-8 BOM (requires 3 bytes)
+    if (buffer.length >= 3 && firstByte === 0xEF && buffer[1] === 0xBB && buffer[2] === 0xBF) {
       return true;
     }
 

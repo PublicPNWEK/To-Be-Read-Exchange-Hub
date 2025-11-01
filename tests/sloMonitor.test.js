@@ -26,6 +26,7 @@ describe('SLO Monitor', () => {
   });
 
   test('histogram metric registers observations', () => {
+    // Note: sloLatency.hashMap is a plain object (not a Map), so we use Object.keys().length
     const beforeCount = Object.keys(sloLatency.hashMap).length;
     sloMonitor.recordRequest(50, false, '/api/metric', 'POST');
     const afterCount = Object.keys(sloLatency.hashMap).length;
