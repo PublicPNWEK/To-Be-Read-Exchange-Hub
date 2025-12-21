@@ -9,7 +9,7 @@ class GracefulShutdown {
     this.server = server;
     this.pool = pool;
     this.shuttingDown = false;
-    
+
     this.options = {
       timeout: options.timeout || 30000, // 30 seconds
       keepAliveTimeout: options.keepAliveTimeout || 5000,
@@ -27,7 +27,7 @@ class GracefulShutdown {
   setupConnectionTracking() {
     this.server.on('connection', (connection) => {
       this.connections.add(connection);
-      
+
       connection.on('close', () => {
         this.connections.delete(connection);
       });
@@ -113,7 +113,7 @@ class GracefulShutdown {
       }
 
       // Wait a moment for connections to close gracefully
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       // Step 3: Destroy remaining connections
       logger.info({ remaining: this.connections.size }, 'Step 3: Destroying remaining connections');

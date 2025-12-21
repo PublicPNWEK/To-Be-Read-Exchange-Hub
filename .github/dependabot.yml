@@ -2,72 +2,72 @@ version: 2
 
 updates:
   # npm dependencies
-  - package-ecosystem: "npm"
-    directory: "/"
+  - package-ecosystem: 'npm'
+    directory: '/'
     schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "06:00"
+      interval: 'weekly'
+      day: 'monday'
+      time: '06:00'
     open-pull-requests-limit: 10
     reviewers:
-      - "PNW-E"
+      - 'PNW-E'
     assignees:
-      - "PNW-E"
+      - 'PNW-E'
     labels:
-      - "dependencies"
-      - "automated"
+      - 'dependencies'
+      - 'automated'
     commit-message:
-      prefix: "chore"
-      prefix-development: "chore"
-      include: "scope"
+      prefix: 'chore'
+      prefix-development: 'chore'
+      include: 'scope'
     # Group minor and patch updates together
     groups:
       development-dependencies:
-        dependency-type: "development"
+        dependency-type: 'development'
         update-types:
-          - "minor"
-          - "patch"
+          - 'minor'
+          - 'patch'
       production-dependencies:
-        dependency-type: "production"
+        dependency-type: 'production'
         update-types:
-          - "patch"
+          - 'patch'
     # Security updates always create individual PRs
     ignore:
       # Ignore major version updates for stable dependencies (manual review required)
-      - dependency-name: "*"
-        update-types: ["version-update:semver-major"]
+      - dependency-name: '*'
+        update-types: ['version-update:semver-major']
     # Allow automatic merging of security patches
     pull-request-branch-name:
-      separator: "-"
+      separator: '-'
 
   # GitHub Actions
-  - package-ecosystem: "github-actions"
-    directory: "/"
+  - package-ecosystem: 'github-actions'
+    directory: '/'
     schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "06:00"
+      interval: 'weekly'
+      day: 'monday'
+      time: '06:00'
     open-pull-requests-limit: 5
     reviewers:
-      - "PNW-E"
+      - 'PNW-E'
     labels:
-      - "dependencies"
-      - "github-actions"
+      - 'dependencies'
+      - 'github-actions'
     commit-message:
-      prefix: "ci"
+      prefix: 'ci'
 
   # Docker
-  - package-ecosystem: "docker"
-    directory: "/"
+  - package-ecosystem: 'docker'
+    directory: '/'
     schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "06:00"
+      interval: 'weekly'
+      day: 'monday'
+      time: '06:00'
     open-pull-requests-limit: 3
     reviewers:
-      - "PNW-E"
+      - 'PNW-E'
     labels:
-      - "dependencies"
-      - "docker"
+      - 'dependencies'
+      - 'docker'
     commit-message:
-      prefix: "build"
+      prefix: 'build'

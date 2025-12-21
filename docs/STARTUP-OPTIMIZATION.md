@@ -5,6 +5,7 @@
 ### What We Built
 
 #### 1. **Quickstart Script** (`npm run go`)
+
 - **Purpose**: Single command setup from scratch
 - **Features**:
   - OS detection (Linux/Mac/Windows)
@@ -17,6 +18,7 @@
 - **Time**: ~60 seconds from clone to running app
 
 #### 2. **Smart Start** (`npm start`)
+
 - **Purpose**: Intelligent startup with validation
 - **Features**:
   - Auto-detects missing `.env` → runs quickstart
@@ -27,6 +29,7 @@
 - **Time**: ~5 seconds if already configured
 
 #### 3. **Dev Container** (`.devcontainer/devcontainer.json`)
+
 - **Purpose**: VS Code one-click environment
 - **Features**:
   - Pre-configured Node.js 20 + PostgreSQL 16
@@ -37,6 +40,7 @@
 - **Time**: First launch ~2 minutes, subsequent ~10 seconds
 
 #### 4. **Auto-Setup Script** (`scripts/auto-setup.sh`)
+
 - **Purpose**: Dev container initialization
 - **Features**:
   - Creates `.env` with dev defaults
@@ -47,19 +51,20 @@
 
 ### Comparison: Before vs After
 
-| Aspect | Before | After |
-|--------|--------|-------|
-| **First-time setup** | 15+ minutes (manual steps) | 60 seconds (`npm run go`) |
-| **Configuration** | Manual `.env` editing | Auto-generated with prompts |
-| **Database setup** | Manual SQL execution | Automatic with validation |
-| **Troubleshooting** | Search docs/issues | Built-in suggestions |
-| **Docker option** | Manual docker-compose | Interactive choice in quickstart |
-| **Health validation** | Manual curl checks | Automatic with retry logic |
-| **Dev container** | Not available | One-click in VS Code |
+| Aspect                | Before                     | After                            |
+| --------------------- | -------------------------- | -------------------------------- |
+| **First-time setup**  | 15+ minutes (manual steps) | 60 seconds (`npm run go`)        |
+| **Configuration**     | Manual `.env` editing      | Auto-generated with prompts      |
+| **Database setup**    | Manual SQL execution       | Automatic with validation        |
+| **Troubleshooting**   | Search docs/issues         | Built-in suggestions             |
+| **Docker option**     | Manual docker-compose      | Interactive choice in quickstart |
+| **Health validation** | Manual curl checks         | Automatic with retry logic       |
+| **Dev container**     | Not available              | One-click in VS Code             |
 
 ### User Flows
 
 #### Flow 1: Absolute Beginner
+
 ```bash
 git clone <repo>
 cd <repo>
@@ -71,6 +76,7 @@ npm run go
 ```
 
 #### Flow 2: Developer (Local)
+
 ```bash
 git clone <repo>
 cd <repo>
@@ -83,6 +89,7 @@ npm run go
 ```
 
 #### Flow 3: VS Code User
+
 ```
 1. Open in VS Code
 2. Click "Reopen in Container"
@@ -92,6 +99,7 @@ npm run go
 ```
 
 #### Flow 4: Returning User
+
 ```bash
 npm start
 # → Auto health-check
@@ -162,4 +170,5 @@ npm start
 
 ---
 
-**Result**: Zero-experience users can now go from `git clone` to running application in under 60 seconds with minimal to zero manual intervention.
+**Result**: Zero-experience users can now go from `git clone` to running application in under 60
+seconds with minimal to zero manual intervention.

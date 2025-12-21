@@ -21,7 +21,7 @@ class ConcurrencyLimiter {
   async execute(fn) {
     while (this.running >= this.maxConcurrent) {
       // Wait for a slot to free up
-      await new Promise(resolve => this.queue.push(resolve));
+      await new Promise((resolve) => this.queue.push(resolve));
     }
 
     this.running++;
@@ -30,7 +30,7 @@ class ConcurrencyLimiter {
       return await fn();
     } finally {
       this.running--;
-      
+
       // Release next queued operation
       if (this.queue.length > 0) {
         const resolve = this.queue.shift();
@@ -54,7 +54,7 @@ class ConcurrencyLimiter {
    * Clear queue (for testing)
    */
   clear() {
-    this.queue.forEach(resolve => resolve());
+    this.queue.forEach((resolve) => resolve());
     this.queue = [];
     this.running = 0;
   }
@@ -242,10 +242,7 @@ async function streamCSV(filePath, onRow, options = {}) {
   const fs = require('fs');
   const readline = require('readline');
 
-  const {
-    skipHeader = true,
-    maxRows = 1000,
-  } = options;
+  const { skipHeader = true, maxRows = 1000 } = options;
 
   return new Promise((resolve, reject) => {
     const fileStream = fs.createReadStream(filePath);
@@ -260,7 +257,7 @@ async function streamCSV(filePath, onRow, options = {}) {
 
     rl.on('line', async (line) => {
       if (rowCount === 0 && skipHeader) {
-        headers = line.split(',').map(h => h.trim().toLowerCase());
+        headers = line.split(',').map((h) => h.trim().toLowerCase());
         rowCount++;
         return;
       }
@@ -272,7 +269,7 @@ async function streamCSV(filePath, onRow, options = {}) {
 
       const values = line.split(',');
       const row = {};
-      
+
       headers.forEach((header, index) => {
         row[header] = values[index]?.trim() || '';
       });

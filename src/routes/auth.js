@@ -29,7 +29,8 @@ router.post('/register', async (req, res, next) => {
     const user = result.rows[0];
     return res.status(201).json({ success: true, user, token: generateToken(user) });
   } catch (err) {
-    if (err.code === '23505') { // unique violation
+    if (err.code === '23505') {
+      // unique violation
       return res.status(409).json({ success: false, error: 'Email already registered' });
     }
     next(err);
@@ -43,7 +44,10 @@ router.post('/login', async (req, res, next) => {
     if (!email || !password) {
       return res.status(400).json({ success: false, error: 'Email and password required' });
     }
-    const result = await pool.query('SELECT id, email, password_hash, display_name FROM users WHERE email=$1 AND is_active=true', [email]);
+    const result = await pool.query(
+      'SELECT id, email, password_hash, display_name FROM users WHERE email=$1 AND is_active=true',
+      [email]
+    );
     const user = result.rows[0];
     if (!user) {
       return res.status(401).json({ success: false, error: 'Invalid credentials' });
@@ -53,7 +57,11 @@ router.post('/login', async (req, res, next) => {
       return res.status(401).json({ success: false, error: 'Invalid credentials' });
     }
     const token = generateToken(user);
-    return res.json({ success: true, user: { id: user.id, email: user.email, display_name: user.display_name }, token });
+    return res.json({
+      success: true,
+      user: { id: user.id, email: user.email, display_name: user.display_name },
+      token,
+    });
   } catch (err) {
     next(err);
   }

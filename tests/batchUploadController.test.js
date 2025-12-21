@@ -9,12 +9,10 @@ describe('Batch Upload Controller', () => {
 
   beforeAll(async () => {
     // Get auth token for tests
-    const loginRes = await request(app)
-      .post('/api/auth/login')
-      .send({
-        email: 'test@example.com',
-        password: 'password123',
-      });
+    const loginRes = await request(app).post('/api/auth/login').send({
+      email: 'test@example.com',
+      password: 'password123',
+    });
 
     authToken = loginRes.body.token;
   });
@@ -22,7 +20,7 @@ describe('Batch Upload Controller', () => {
   afterAll(async () => {
     // Cleanup test data
     await pool.query('DELETE FROM batch_uploads WHERE total_books < 10');
-    await pool.query('DELETE FROM incoming_books WHERE created_at > NOW() - INTERVAL \'1 hour\'');
+    await pool.query("DELETE FROM incoming_books WHERE created_at > NOW() - INTERVAL '1 hour'");
     await pool.end();
   });
 
@@ -62,12 +60,11 @@ describe('Batch Upload Controller', () => {
 
       const jsonPath = path.join(__dirname, 'test-batch.json');
       const imagePath = path.join(__dirname, 'test-cover.jpg');
-      
+
       // Create dummy image (1x1 pixel JPEG)
       const jpegBuffer = Buffer.from([
-        0xFF, 0xD8, 0xFF, 0xE0, 0x00, 0x10, 0x4A, 0x46,
-        0x49, 0x46, 0x00, 0x01, 0x01, 0x00, 0x00, 0x01,
-        0x00, 0x01, 0x00, 0x00, 0xFF, 0xDB, 0x00, 0x43,
+        0xff, 0xd8, 0xff, 0xe0, 0x00, 0x10, 0x4a, 0x46, 0x49, 0x46, 0x00, 0x01, 0x01, 0x00, 0x00,
+        0x01, 0x00, 0x01, 0x00, 0x00, 0xff, 0xdb, 0x00, 0x43,
       ]);
       await fs.writeFile(jsonPath, jsonContent);
       await fs.writeFile(imagePath, jpegBuffer);
@@ -98,11 +95,13 @@ describe('Batch Upload Controller', () => {
     });
 
     it('should reject batch exceeding size limit', async () => {
-      const books = Array(1001).fill(null).map((_, i) => ({
-        isbn: `978${String(i).padStart(10, '0')}`,
-        title: `Book ${i}`,
-        author: 'Author',
-      }));
+      const books = Array(1001)
+        .fill(null)
+        .map((_, i) => ({
+          isbn: `978${String(i).padStart(10, '0')}`,
+          title: `Book ${i}`,
+          author: 'Author',
+        }));
 
       const jsonPath = path.join(__dirname, 'large-batch.json');
       await fs.writeFile(jsonPath, JSON.stringify(books));
@@ -114,7 +113,7 @@ describe('Batch Upload Controller', () => {
         .expect(400);
 
       expect(res.body.success).toBe(false);
-      expect(res.body.errors.some(e => e.message.includes('too large'))).toBe(true);
+      expect(res.body.errors.some((e) => e.message.includes('too large'))).toBe(true);
 
       // Cleanup
       await fs.unlink(jsonPath);
@@ -134,7 +133,7 @@ invalid-isbn,Test Book,Author`;
         .expect(400);
 
       expect(res.body.success).toBe(false);
-      expect(res.body.errors.some(e => e.message && e.message.includes('ISBN'))).toBe(true);
+      expect(res.body.errors.some((e) => e.message && e.message.includes('ISBN'))).toBe(true);
 
       // Cleanup
       await fs.unlink(csvPath);
@@ -227,7 +226,7 @@ invalid-isbn,Test Book,Author`;
         .expect(200);
 
       expect(res.body.success).toBe(true);
-      expect(res.body.queue.every(item => item.processing_status === 'completed')).toBe(true);
+      expect(res.body.queue.every((item) => item.processing_status === 'completed')).toBe(true);
     });
   });
 });
