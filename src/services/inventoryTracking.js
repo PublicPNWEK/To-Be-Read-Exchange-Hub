@@ -171,7 +171,6 @@ async function findGenreShelf(genre) {
  */
 async function getNextSection(shelf) {
   const result = await pool.query(
-    // eslint-disable-next-line quotes
     "SELECT COALESCE(MAX(CAST(section AS INTEGER)), 0) + 1 as next_section FROM books WHERE shelf_location = $1 AND section ~ '^[0-9]+$'",
     [shelf]
   );
