@@ -16,7 +16,7 @@ async function getShelfCapacity(shelf, section = null) {
     const query = section
       ? 'SELECT * FROM shelf_capacity WHERE shelf_location = $1 AND section = $2'
       : 'SELECT * FROM shelf_capacity WHERE shelf_location = $1';
-    
+
     const params = section ? [shelf, section] : [shelf];
     const result = await pool.query(query, params);
 
@@ -27,11 +27,11 @@ async function getShelfCapacity(shelf, section = null) {
     const capacity = result.rows[0];
     const availableSpace = capacity.max_capacity - capacity.current_count;
     const utilization = (capacity.current_count / capacity.max_capacity) * 100;
-    
+
     return {
       ...capacity,
       available_space: availableSpace,
-      available: availableSpace,  // Alias for test compatibility - tests expect 'available' property
+      available: availableSpace, // Alias for test compatibility - tests expect 'available' property
       utilization: utilization,
     };
   } catch (error) {
@@ -89,16 +89,16 @@ async function findOptimalShelf(bookData, options = {}) {
 
   if (preferredShelf) {
     // Parse preferred shelf if it contains section (e.g., 'B-01')
-    const [shelfPart, sectionPart] = preferredShelf.includes('-') 
-      ? preferredShelf.split('-') 
+    const [shelfPart, sectionPart] = preferredShelf.includes('-')
+      ? preferredShelf.split('-')
       : [preferredShelf, null];
-    
+
     const capacity = await getShelfCapacity(shelfPart, sectionPart);
     if (capacity && capacity.available_space > 0) {
       return {
         shelf_location: shelfPart,
         shelf: shelfPart,
-        section: sectionPart || await getNextSection(shelfPart),
+        section: sectionPart || (await getNextSection(shelfPart)),
         placement_reason: 'manual_preference',
         utilization: capacity.utilization,
       };
@@ -124,10 +124,10 @@ async function findOptimalShelf(bookData, options = {}) {
 
   // Author alphabetical (fallback)
   const authorLetter = (author || 'Unknown').trim().charAt(0).toUpperCase();
-  const shelf = (authorLetter >= 'A' && authorLetter <= 'Z') ? authorLetter : 'Z';
-  
+  const shelf = authorLetter >= 'A' && authorLetter <= 'Z' ? authorLetter : 'Z';
+
   const capacity = await getShelfCapacity(shelf);
-  
+
   if (avoidFull && capacity && capacity.available_space === 0) {
     // Find nearest shelf with space
     return await findNearestAvailableShelf(shelf);
@@ -139,7 +139,7 @@ async function findOptimalShelf(bookData, options = {}) {
   }
 
   const section = await getNextSection(shelf);
-  
+
   return {
     shelf_location: shelf,
     shelf: shelf,
@@ -209,7 +209,7 @@ async function findNearestAvailableShelf(targetShelf) {
 
   // Fallback: create new overflow shelf
   await createShelfCapacity('OVERFLOW', '01', 200);
-  
+
   return {
     shelf_location: 'OVERFLOW',
     shelf: 'OVERFLOW',

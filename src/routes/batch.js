@@ -1,6 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const { upload, batchUploadBooks, getBatchStatus } = require('../controllers/batchUploadController');
+const {
+  upload,
+  batchUploadBooks,
+  getBatchStatus,
+} = require('../controllers/batchUploadController');
 const { getInventoryStatus, getIncomingQueue } = require('../services/inventoryTracking');
 const asyncHandler = require('../utils/asyncHandler');
 
@@ -10,10 +14,10 @@ const asyncHandler = require('../utils/asyncHandler');
  *   post:
  *     summary: Batch upload books with AI enrichment
  *     description: |
- *       Upload multiple books via CSV/JSON manifest with optional cover images. 
- *       Books are automatically enriched with metadata from AI providers (Gemini, Claude, OpenAI) 
+ *       Upload multiple books via CSV/JSON manifest with optional cover images.
+ *       Books are automatically enriched with metadata from AI providers (Gemini, Claude, OpenAI)
  *       and assigned optimal shelf locations based on genre and capacity.
- *       
+ *
  *       **CSV Format:**
  *       ```csv
  *       isbn,upc,asin,title,author,publisher,condition,quantity,description,genre,format,shelf_location
@@ -21,11 +25,11 @@ const asyncHandler = require('../utils/asyncHandler');
  *       ,012345678905,,To Kill a Mockingbird,Harper Lee,J.B. Lippincott,Like New,3,,Fiction,Paperback,
  *       ,,B00ZV9PXP2,Digital Fortress,Dan Brown,St. Martin's Press,New,10,A techno-thriller,Thriller,,
  *       ```
- *       
+ *
  *       **Image Naming Convention:**
  *       - Match by ISBN: `isbn_9780123456789.jpg`
  *       - Match by row number: `1.jpg` (first book), `2.jpg` (second book), etc.
- *       
+ *
  *       **Supported Conditions:** New, Like New, Very Good, Good, Acceptable, Poor
  *     tags: [Batch Upload]
  *     security:
@@ -85,9 +89,9 @@ router.post(
  *   get:
  *     summary: Get batch upload status and progress
  *     description: |
- *       Monitor the processing status of a batch upload including progress, 
+ *       Monitor the processing status of a batch upload including progress,
  *       success/failure counts, and detailed error logs.
- *       
+ *
  *       Polls this endpoint every 2-5 seconds to track progress until status is 'completed' or 'failed'.
  *     tags: [Batch Upload]
  *     security:
@@ -136,7 +140,7 @@ router.get('/:id', asyncHandler(getBatchStatus));
  *   get:
  *     summary: Get inventory capacity status
  *     description: |
- *       Retrieve current shelf capacity, utilization percentages, and available space 
+ *       Retrieve current shelf capacity, utilization percentages, and available space
  *       across all shelves. Useful for capacity planning and identifying overflow needs.
  *     tags: [Batch Upload]
  *     security:
@@ -160,10 +164,13 @@ router.get('/:id', asyncHandler(getBatchStatus));
  *       401:
  *         description: Unauthorized
  */
-router.get('/inventory/status', asyncHandler(async (req, res) => {
-  const status = await getInventoryStatus();
-  res.json({ success: true, ...status });
-}));
+router.get(
+  '/inventory/status',
+  asyncHandler(async (req, res) => {
+    const status = await getInventoryStatus();
+    res.json({ success: true, ...status });
+  })
+);
 
 /**
  * @swagger
@@ -171,7 +178,7 @@ router.get('/inventory/status', asyncHandler(async (req, res) => {
  *   get:
  *     summary: View incoming book queue
  *     description: |
- *       View books in the processing queue with detailed status, enrichment progress, 
+ *       View books in the processing queue with detailed status, enrichment progress,
  *       and shelf allocation. Filter by batch ID or processing status.
  *     tags: [Batch Upload]
  *     security:
@@ -216,15 +223,18 @@ router.get('/inventory/status', asyncHandler(async (req, res) => {
  *       401:
  *         description: Unauthorized
  */
-router.get('/queue', asyncHandler(async (req, res) => {
-  const filters = {
-    status: req.query.status,
-    batch_id: req.query.batch_id ? parseInt(req.query.batch_id, 10) : null,
-    limit: req.query.limit ? parseInt(req.query.limit, 10) : 50,
-  };
+router.get(
+  '/queue',
+  asyncHandler(async (req, res) => {
+    const filters = {
+      status: req.query.status,
+      batch_id: req.query.batch_id ? parseInt(req.query.batch_id, 10) : null,
+      limit: req.query.limit ? parseInt(req.query.limit, 10) : 50,
+    };
 
-  const queue = await getIncomingQueue(filters);
-  res.json({ success: true, count: queue.length, queue });
-}));
+    const queue = await getIncomingQueue(filters);
+    res.json({ success: true, count: queue.length, queue });
+  })
+);
 
 module.exports = router;

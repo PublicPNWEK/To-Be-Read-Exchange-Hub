@@ -12,21 +12,23 @@ async function getContent(keys = []) {
   }
   const result = await pool.query(query, params);
   const map = {};
-  result.rows.forEach(r => { map[r.content_key] = r.content_value; });
+  result.rows.forEach((r) => {
+    map[r.content_key] = r.content_value;
+  });
 
   // Render markdown for policy if present
   if (map.exchange_policy_md?.markdown) {
     try {
       const rawHtml = marked.parse(map.exchange_policy_md.markdown);
       map.exchange_policy_html = sanitizeHtml(rawHtml, {
-        allowedTags: sanitizeHtml.defaults.allowedTags.concat(['h1','h2','h3','img']),
+        allowedTags: sanitizeHtml.defaults.allowedTags.concat(['h1', 'h2', 'h3', 'img']),
         allowedAttributes: {
-          a: ['href','name','target','rel'],
-          img: ['src','alt','title'],
+          a: ['href', 'name', 'target', 'rel'],
+          img: ['src', 'alt', 'title'],
         },
         transformTags: {
-          a: sanitizeHtml.simpleTransform('a', { rel: 'noopener nofollow' })
-        }
+          a: sanitizeHtml.simpleTransform('a', { rel: 'noopener nofollow' }),
+        },
       });
     } catch (e) {
       logger.warn('Failed to render policy markdown', { error: e.message });

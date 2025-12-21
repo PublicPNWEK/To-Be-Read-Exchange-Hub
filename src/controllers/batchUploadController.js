@@ -19,7 +19,7 @@ const storage = multer.diskStorage({
     cb(null, uploadDir);
   },
   filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
     cb(null, `${file.fieldname}-${uniqueSuffix}${path.extname(file.originalname)}`);
   },
 });
@@ -66,7 +66,7 @@ async function batchUploadBooks(req, res) {
     // Parse manifest (CSV or JSON)
     if (req.files?.manifest) {
       const manifestFile = req.files.manifest[0];
-      
+
       if (path.extname(manifestFile.originalname).toLowerCase() === '.csv') {
         const csvText = await fs.readFile(manifestFile.path, 'utf8');
         const parsed = Papa.parse(csvText, {
@@ -98,15 +98,15 @@ async function batchUploadBooks(req, res) {
       throw new Error('Batch too large (max 1000 books)');
     }
 
-    await client.query(
-      'UPDATE batch_uploads SET total_books = $1 WHERE id = $2',
-      [books.length, batchId]
-    );
+    await client.query('UPDATE batch_uploads SET total_books = $1 WHERE id = $2', [
+      books.length,
+      batchId,
+    ]);
 
     // Map uploaded images to books (if provided)
     const imageMap = {};
     if (req.files?.images) {
-      req.files.images.forEach(img => {
+      req.files.images.forEach((img) => {
         // Extract book identifier from filename (e.g., "isbn_9780123456789.jpg" or "1.jpg")
         const match = img.originalname.match(/^(?:isbn_)?([^.]+)/);
         if (match) {
@@ -176,13 +176,19 @@ async function batchUploadBooks(req, res) {
       `UPDATE batch_uploads 
        SET processed_books = $1, successful_books = $2, failed_books = $3, error_log = $4
        WHERE id = $5`,
-      [results.processed, results.processed - results.failed, results.failed, JSON.stringify(results.errors), batchId]
+      [
+        results.processed,
+        results.processed - results.failed,
+        results.failed,
+        JSON.stringify(results.errors),
+        batchId,
+      ]
     );
 
     await client.query('COMMIT');
 
     // Start background processing (async)
-    processBatch(batchId).catch(err => {
+    processBatch(batchId).catch((err) => {
       logger.error(`Background batch processing failed for batch ${batchId}: ${err.message}`);
     });
 
@@ -191,7 +197,6 @@ async function batchUploadBooks(req, res) {
       message: 'Batch queued for processing',
       ...results,
     });
-
   } catch (error) {
     await client.query('ROLLBACK');
     logger.error(`Batch upload failed: ${error.message}`);
@@ -287,7 +292,7 @@ async function processBatch(batchId) {
         successful++;
       } catch (error) {
         logger.error(`Failed to process incoming book ${incomingBook.id}: ${error.message}`);
-        
+
         await client.query(
           'UPDATE incoming_books SET processing_status = $1, error_message = $2, enrichment_attempts = enrichment_attempts + 1 WHERE id = $3',
           ['failed', error.message, incomingBook.id]
@@ -307,15 +312,15 @@ async function processBatch(batchId) {
 
     await client.query('COMMIT');
     logger.info(`Batch ${batchId} processing complete: ${successful} successful, ${failed} failed`);
-
   } catch (error) {
     await client.query('ROLLBACK');
     logger.error(`Batch ${batchId} processing failed: ${error.message}`);
 
-    await pool.query(
-      'UPDATE batch_uploads SET status = $1, error_log = $2 WHERE id = $3',
-      ['failed', JSON.stringify({ error: error.message }), batchId]
-    );
+    await pool.query('UPDATE batch_uploads SET status = $1, error_log = $2 WHERE id = $3', [
+      'failed',
+      JSON.stringify({ error: error.message }),
+      batchId,
+    ]);
   } finally {
     client.release();
   }
@@ -329,10 +334,7 @@ async function getBatchStatus(req, res) {
   const { id } = req.params;
 
   try {
-    const batchResult = await pool.query(
-      'SELECT * FROM batch_uploads WHERE id = $1',
-      [id]
-    );
+    const batchResult = await pool.query('SELECT * FROM batch_uploads WHERE id = $1', [id]);
 
     if (batchResult.rows.length === 0) {
       return res.status(404).json({ success: false, error: 'Batch not found' });
@@ -349,7 +351,7 @@ async function getBatchStatus(req, res) {
     );
 
     const statusCounts = {};
-    queueResult.rows.forEach(row => {
+    queueResult.rows.forEach((row) => {
       statusCounts[row.processing_status] = parseInt(row.count, 10);
     });
 
@@ -358,9 +360,11 @@ async function getBatchStatus(req, res) {
       batch: {
         ...batch,
         queue_status: statusCounts,
-        progress: batch.total_books > 0
-          ? ((statusCounts.completed || 0) + (statusCounts.failed || 0)) / batch.total_books * 100
-          : 0,
+        progress:
+          batch.total_books > 0
+            ? (((statusCounts.completed || 0) + (statusCounts.failed || 0)) / batch.total_books) *
+              100
+            : 0,
       },
     });
   } catch (error) {

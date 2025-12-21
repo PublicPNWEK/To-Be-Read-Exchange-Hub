@@ -7,13 +7,13 @@ const crypto = require('crypto');
 const securityHeaders = helmet({
   contentSecurityPolicy: {
     directives: {
-  // CSP keywords must be single-quoted in the header value; escape inner quotes for lint compliance
-  defaultSrc: ['\'self\''],
-  styleSrc: ['\'self\'', '\'unsafe-inline\'', 'https://fonts.googleapis.com'],
-  fontSrc: ['\'self\'', 'https://fonts.gstatic.com'],
-  imgSrc: ['\'self\'', 'data:', 'https://covers.openlibrary.org', 'https://books.google.com'],
-  scriptSrc: ['\'self\'', '\'unsafe-inline\''],
-  connectSrc: ['\'self\''],
+      // CSP keywords must be single-quoted in the header value; escape inner quotes for lint compliance
+      defaultSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
+      fontSrc: ["'self'", 'https://fonts.gstatic.com'],
+      imgSrc: ["'self'", 'data:', 'https://covers.openlibrary.org', 'https://books.google.com'],
+      scriptSrc: ["'self'", "'unsafe-inline'"],
+      connectSrc: ["'self'"],
     },
   },
   hsts: {
@@ -53,13 +53,10 @@ const apiKeyAuth = (req, res, next) => {
 
   let isValid = false;
   try {
-    isValid = validApiKeys.some(validKey => {
+    isValid = validApiKeys.some((validKey) => {
       // Only compare if lengths match to avoid timingSafeEqual throw
       if (apiKey.length !== validKey.length) return false;
-      return crypto.timingSafeEqual(
-        Buffer.from(apiKey),
-        Buffer.from(validKey)
-      );
+      return crypto.timingSafeEqual(Buffer.from(apiKey), Buffer.from(validKey));
     });
   } catch {
     // Defensive: treat any error as invalid
