@@ -68,7 +68,11 @@ const options = {
             processed_books: { type: 'integer', example: 25 },
             successful_books: { type: 'integer', example: 23 },
             failed_books: { type: 'integer', example: 2 },
-            status: { type: 'string', enum: ['pending', 'processing', 'completed', 'failed'], example: 'processing' },
+            status: {
+              type: 'string',
+              enum: ['pending', 'processing', 'completed', 'failed'],
+              example: 'processing',
+            },
             progress: { type: 'number', format: 'float', example: 50.0 },
             error_log: {
               type: 'array',
@@ -94,10 +98,22 @@ const options = {
             asin: { type: 'string', example: 'B00ZV9PXP2' },
             title: { type: 'string', example: 'The Great Gatsby' },
             author: { type: 'string', example: 'F. Scott Fitzgerald' },
-            condition: { type: 'string', enum: ['New', 'Like New', 'Very Good', 'Good', 'Acceptable', 'Poor'], example: 'Good' },
-            processing_status: { type: 'string', enum: ['pending', 'processing', 'completed', 'failed'], example: 'completed' },
+            condition: {
+              type: 'string',
+              enum: ['New', 'Like New', 'Very Good', 'Good', 'Acceptable', 'Poor'],
+              example: 'Good',
+            },
+            processing_status: {
+              type: 'string',
+              enum: ['pending', 'processing', 'completed', 'failed'],
+              example: 'completed',
+            },
             shelf_location: { type: 'string', example: 'A-12' },
-            enrichment_status: { type: 'string', enum: ['pending', 'completed', 'failed'], example: 'completed' },
+            enrichment_status: {
+              type: 'string',
+              enum: ['pending', 'completed', 'failed'],
+              example: 'completed',
+            },
             created_at: { type: 'string', format: 'date-time' },
           },
         },
@@ -134,10 +150,7 @@ const options = {
         },
       },
     },
-    security: [
-      { BearerAuth: [] },
-      { ApiKeyAuth: [] },
-    ],
+    security: [{ BearerAuth: [] }, { ApiKeyAuth: [] }],
   },
   apis: ['./src/routes/*.js', './src/server.js'], // Path to route files with JSDoc annotations
 };

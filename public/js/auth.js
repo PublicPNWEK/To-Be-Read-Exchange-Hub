@@ -37,30 +37,30 @@ function logout() {
  */
 async function authenticatedFetch(url, options = {}) {
   const token = getAuthToken();
-  
+
   if (!token) {
     window.location.href = '/login.html';
     throw new Error('Not authenticated');
   }
-  
+
   const headers = {
     ...options.headers,
-    'Authorization': `Bearer ${token}`,
+    Authorization: `Bearer ${token}`,
     'Content-Type': 'application/json',
   };
-  
+
   const response = await fetch(url, {
     ...options,
     headers,
   });
-  
+
   // Handle 401 Unauthorized
   if (response.status === 401) {
     alert('Session expired. Please login again.');
     logout();
     throw new Error('Unauthorized');
   }
-  
+
   return response;
 }
 
@@ -70,9 +70,9 @@ async function authenticatedFetch(url, options = {}) {
 function updateNavbar() {
   const user = getStoredUser();
   const authLinks = document.getElementById('authLinks');
-  
+
   if (!authLinks) return;
-  
+
   if (user) {
     authLinks.innerHTML = `
       <span style="margin-right: 15px; color: #4CAF50;">👤 ${user.display_name || user.email}</span>

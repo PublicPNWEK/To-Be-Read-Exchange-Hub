@@ -23,8 +23,10 @@ describe('Inventory Tracking Service', () => {
   });
 
   afterAll(async () => {
-    await pool.query('DELETE FROM shelf_capacity WHERE shelf_location IN (\'A\', \'B\', \'C\', \'OVERFLOW\')');
-    await pool.query('DELETE FROM incoming_books WHERE isbn LIKE \'TEST-%\'');
+    await pool.query(
+      "DELETE FROM shelf_capacity WHERE shelf_location IN ('A', 'B', 'C', 'OVERFLOW')"
+    );
+    await pool.query("DELETE FROM incoming_books WHERE isbn LIKE 'TEST-%'");
     await pool.end();
   });
 
@@ -145,7 +147,7 @@ describe('Inventory Tracking Service', () => {
   describe('updateShelfCount', () => {
     it('should increment shelf count', async () => {
       const before = await getShelfCapacity('B', '01');
-      
+
       await updateShelfCount('B', '01', 5);
 
       const after = await getShelfCapacity('B', '01');
@@ -155,7 +157,7 @@ describe('Inventory Tracking Service', () => {
 
     it('should decrement shelf count', async () => {
       const before = await getShelfCapacity('B', '01');
-      
+
       await updateShelfCount('B', '01', -3);
 
       const after = await getShelfCapacity('B', '01');
@@ -205,7 +207,7 @@ describe('Inventory Tracking Service', () => {
     beforeAll(async () => {
       // Create test batch
       const batchResult = await pool.query(
-        'INSERT INTO batch_uploads (user_id, total_books, status) VALUES (1, 3, \'processing\') RETURNING id'
+        "INSERT INTO batch_uploads (user_id, total_books, status) VALUES (1, 3, 'processing') RETURNING id"
       );
       testBatchId = batchResult.rows[0].id;
 
@@ -275,17 +277,19 @@ describe('Inventory Tracking Service', () => {
     });
 
     it('should handle concurrent shelf allocations', async () => {
-      const promises = Array(10).fill(null).map((_, i) =>
-        findOptimalShelf({
-          title: `Concurrent Book ${i}`,
-          author: 'Author',
-          genre: 'Fiction',
-        })
-      );
+      const promises = Array(10)
+        .fill(null)
+        .map((_, i) =>
+          findOptimalShelf({
+            title: `Concurrent Book ${i}`,
+            author: 'Author',
+            genre: 'Fiction',
+          })
+        );
 
       const results = await Promise.all(promises);
 
-      expect(results.every(r => r !== null)).toBe(true);
+      expect(results.every((r) => r !== null)).toBe(true);
     });
   });
 });

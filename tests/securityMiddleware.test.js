@@ -27,7 +27,10 @@ describe('security middleware', () => {
     process.env.API_KEY_ENABLED = 'true';
     process.env.API_KEYS = 'abc123';
     const app = express();
-    app.use((req, res, next) => { req.log = { warn: jest.fn() }; next(); });
+    app.use((req, res, next) => {
+      req.log = { warn: jest.fn() };
+      next();
+    });
     app.use(apiKeyAuth);
     app.get('/test', (req, res) => res.send('ok'));
     const res = await require('supertest')(app).get('/test');
@@ -39,7 +42,10 @@ describe('security middleware', () => {
     process.env.API_KEY_ENABLED = 'true';
     process.env.API_KEYS = 'abc123';
     const app = express();
-    app.use((req, res, next) => { req.log = { warn: jest.fn() }; next(); });
+    app.use((req, res, next) => {
+      req.log = { warn: jest.fn() };
+      next();
+    });
     app.use(apiKeyAuth);
     app.get('/test', (req, res) => res.send('ok'));
     const res = await require('supertest')(app).get('/test').set('X-API-Key', 'wrong');
@@ -51,7 +57,10 @@ describe('security middleware', () => {
     process.env.API_KEY_ENABLED = 'true';
     process.env.API_KEYS = 'abc123';
     const app = express();
-    app.use((req, res, next) => { req.log = { warn: jest.fn() }; next(); });
+    app.use((req, res, next) => {
+      req.log = { warn: jest.fn() };
+      next();
+    });
     app.use(apiKeyAuth);
     app.get('/test', (req, res) => res.send('ok'));
     const res = await require('supertest')(app).get('/test').set('X-API-Key', 'abc123');

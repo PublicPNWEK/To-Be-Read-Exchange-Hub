@@ -2,7 +2,8 @@
 
 **To-Be-Read Exchange Hub** - Production-grade open-source book exchange platform
 
-This document outlines the enterprise-level features, standards, and best practices that make this freeware project stand out as a professional-grade solution suitable for production deployments.
+This document outlines the enterprise-level features, standards, and best practices that make this
+freeware project stand out as a professional-grade solution suitable for production deployments.
 
 ---
 
@@ -27,7 +28,8 @@ This document outlines the enterprise-level features, standards, and best practi
 
 **Providing enterprise-grade open-source software that communities can trust.**
 
-We believe freeware should meet the same rigorous standards as commercial software. This project demonstrates that open-source can deliver:
+We believe freeware should meet the same rigorous standards as commercial software. This project
+demonstrates that open-source can deliver:
 
 - **Production-Ready**: Battle-tested reliability patterns
 - **Observable**: Full metrics, logs, and tracing
@@ -44,7 +46,7 @@ We believe freeware should meet the same rigorous standards as commercial softwa
 ✅ **Feature Flags** - Safe rollout of new features  
 ✅ **API Versioning** - Backwards compatibility guaranteed  
 ✅ **Security Headers** - OWASP best practices  
-✅ **SLO Monitoring** - Track service level objectives  
+✅ **SLO Monitoring** - Track service level objectives
 
 ---
 
@@ -59,33 +61,37 @@ We believe freeware should meet the same rigorous standards as commercial softwa
 Exposes Prometheus-compatible metrics for monitoring and alerting:
 
 **HTTP Metrics:**
+
 - `http_requests_total` - Total HTTP requests by method, route, status
 - `http_request_duration_seconds` - Request latency histogram (P50, P95, P99)
 - `http_request_errors_total` - Error count by type
 
 **Business Metrics:**
+
 - `book_operations_total` - Book CRUD operations by type and status
 - `enrichment_duration_seconds` - External API call latencies
 - `active_database_connections` - Current DB connection pool size
 
 **SLO Metrics:**
+
 - `slo_availability_ratio` - Service availability percentage (30-day window)
 - `slo_latency_seconds` - Request latency histogram (endpoint × method labels)
 - `slo_error_budget_remaining` - Remaining error budget percentage
 
-**Latency Histogram Details:**
-The `slo_latency_seconds` histogram tracks request durations with:
+**Latency Histogram Details:** The `slo_latency_seconds` histogram tracks request durations with:
+
 - **Labels**: `endpoint`, `method` (enables per-route analysis)
 - **Buckets**: 0.01s, 0.05s, 0.1s, 0.25s, 0.5s, 1s, 2s, 5s
 - **Metrics**: Automatically calculates count, sum, and percentiles (P50, P90, P95, P99)
 
 **Grafana Dashboard Setup:**
+
 ```promql
 # P95 latency by endpoint
 histogram_quantile(0.95, rate(slo_latency_seconds_bucket[5m]))
 
 # P99 latency for specific route
-histogram_quantile(0.99, 
+histogram_quantile(0.99,
   rate(slo_latency_seconds_bucket{endpoint="/api/books"}[5m])
 )
 
@@ -94,6 +100,7 @@ sum(rate(slo_latency_seconds_count[5m])) by (endpoint, method)
 ```
 
 **Example Prometheus Query:**
+
 ```promql
 rate(http_requests_total{status_code=~"5.."}[5m])
 ```
@@ -101,12 +108,14 @@ rate(http_requests_total{status_code=~"5.."}[5m])
 #### Structured Logging
 
 All logs include:
+
 - **Request ID** (`X-Request-ID`) - Distributed tracing
 - **Timestamp** - ISO 8601 format
 - **Log Level** - ERROR, WARN, INFO, DEBUG
 - **Context** - Method, path, duration, user agent, IP
 
 **Example Log:**
+
 ```json
 {
   "level": "info",
@@ -123,12 +132,14 @@ All logs include:
 #### Request Correlation IDs
 
 Every request receives a unique `X-Request-ID` header:
+
 - Automatically generated if not provided
 - Propagated through all logs and downstream calls
 - Returned in response headers
 - Enables end-to-end request tracing
 
 **Usage:**
+
 ```bash
 curl -H "X-Request-ID: my-trace-id" http://localhost:3000/api/books
 ```
@@ -167,6 +178,7 @@ Real-time SLO compliance dashboard:
 ```
 
 **Our SLO Commitments:**
+
 - **Availability:** 99.9% (43.8 minutes downtime/month)
 - **Latency:** P95 < 200ms, P99 < 1s
 - **Error Rate:** < 0.1%
@@ -196,11 +208,13 @@ API_KEYS=key1,key2,key3
 ```
 
 **Usage:**
+
 ```bash
 curl -H "X-API-Key: your-secure-key" http://localhost:3000/api/books
 ```
 
 **Features:**
+
 - Constant-time comparison (prevents timing attacks)
 - Multiple key support (for key rotation)
 - Automatic 401/403 responses
@@ -209,6 +223,7 @@ curl -H "X-API-Key: your-secure-key" http://localhost:3000/api/books
 #### Input Sanitization
 
 All inputs automatically sanitized:
+
 - Removes NULL bytes (`\x00`)
 - Strips control characters (`\x00-\x1F`, `\x7F`)
 - Applies to body, query params, and URL params
@@ -217,12 +232,14 @@ All inputs automatically sanitized:
 #### Rate Limiting
 
 **Configured Limits:**
+
 - API endpoints: 100 requests / 15 minutes
 - Sync operations: 10 requests / 15 minutes
 - Returns `429 Too Many Requests` when exceeded
 - Includes `Retry-After` header
 
 **Customization:**
+
 ```env
 API_RATE_WINDOW_MIN=15
 API_RATE_MAX=100
@@ -239,30 +256,37 @@ SYNC_RATE_MAX=10
 Prevents cascading failures when external APIs fail:
 
 **Configuration:**
+
 - **Timeout**: 5 seconds
 - **Error Threshold**: 50% failure rate opens circuit
 - **Reset Timeout**: 30 seconds before retry
 - **Rolling Window**: 10 second buckets
 
 **States:**
+
 - **Closed**: Normal operation
 - **Open**: Failing fast, rejecting requests
 - **Half-Open**: Testing recovery
 
 **Benefits:**
+
 - Fail fast instead of waiting for timeouts
 - Automatic recovery detection
 - Graceful degradation with fallback data
 - Prevents resource exhaustion
 
 **Example Usage:**
+
 ```javascript
-const breaker = createCircuitBreaker(async (isbn) => {
-  return await externalAPI.fetch(isbn);
-}, { 
-  name: 'open-library-api',
-  fallback: () => createFallbackData(isbn)
-});
+const breaker = createCircuitBreaker(
+  async (isbn) => {
+    return await externalAPI.fetch(isbn);
+  },
+  {
+    name: 'open-library-api',
+    fallback: () => createFallbackData(isbn),
+  }
+);
 ```
 
 #### Graceful Shutdown
@@ -270,6 +294,7 @@ const breaker = createCircuitBreaker(async (isbn) => {
 SIGTERM/SIGINT signal handling with zero dropped requests:
 
 **Shutdown Sequence:**
+
 1. Stop accepting new connections (HTTP server close)
 2. Close idle keep-alive connections
 3. Wait for in-flight requests to complete (30s timeout)
@@ -278,11 +303,13 @@ SIGTERM/SIGINT signal handling with zero dropped requests:
 6. Exit process
 
 **Health Check During Shutdown:**
+
 - Returns `503 Service Unavailable`
 - Load balancers automatically remove from rotation
 - Clients can retry elsewhere
 
 **Environment Variables:**
+
 ```env
 GRACEFUL_SHUTDOWN_TIMEOUT=30000  # 30 seconds
 KEEP_ALIVE_TIMEOUT=5000          # 5 seconds
@@ -291,6 +318,7 @@ KEEP_ALIVE_TIMEOUT=5000          # 5 seconds
 #### Health Checks
 
 **Basic Health:** `GET /health`
+
 ```json
 {
   "status": "ok",
@@ -302,6 +330,7 @@ KEEP_ALIVE_TIMEOUT=5000          # 5 seconds
 ```
 
 **Database Health:** `GET /api/health/db`
+
 ```json
 {
   "status": "ok",
@@ -319,6 +348,7 @@ KEEP_ALIVE_TIMEOUT=5000          # 5 seconds
 #### Compression
 
 Gzip compression enabled for all responses:
+
 - Reduces bandwidth by 60-80%
 - Configurable compression level
 - Automatic content negotiation
@@ -326,6 +356,7 @@ Gzip compression enabled for all responses:
 #### Response Caching
 
 Strategic cache headers:
+
 - Static assets: Long-term caching
 - API responses: No-cache (real-time data)
 - Development: Caching disabled
@@ -333,6 +364,7 @@ Strategic cache headers:
 #### Database Connection Pooling
 
 PostgreSQL connection pool:
+
 - Configurable pool size
 - Automatic reconnection
 - Connection timeout handling
@@ -341,6 +373,7 @@ PostgreSQL connection pool:
 #### Performance Budgets
 
 **Targets:**
+
 - API response time: < 200ms (P95)
 - Time to First Byte: < 100ms
 - Bundle size: < 200KB (frontend)
@@ -357,6 +390,7 @@ PostgreSQL connection pool:
 Safe rollout of new features without deployments.
 
 **Configuration:**
+
 ```env
 FEATURE_FLAG_BULK_OPERATIONS=true
 FEATURE_FLAG_ML_RECOMMENDATIONS=false
@@ -364,6 +398,7 @@ FEATURE_FLAG_REAL_TIME_NOTIFICATIONS=25  # 25% rollout
 ```
 
 **Built-in Features:**
+
 - `api_versioning` - API version support
 - `bulk_operations` - Bulk import/update/delete
 - `enrichment` - External API enrichment
@@ -374,11 +409,13 @@ FEATURE_FLAG_REAL_TIME_NOTIFICATIONS=25  # 25% rollout
 - `correlation_ids` - Distributed tracing
 
 **Percentage Rollout:**
+
 - Consistent hashing based on request ID
 - Same user always gets same experience
 - Gradual rollout: 0% → 25% → 50% → 100%
 
 **Usage in Code:**
+
 ```javascript
 if (req.features.isEnabled('ml_recommendations')) {
   // Show ML-powered recommendations
@@ -392,10 +429,12 @@ if (req.features.isEnabled('ml_recommendations')) {
 #### Versioning Strategy
 
 **URL-based versioning:**
+
 - Current: `/api/v1/books`
 - Future: `/api/v2/books`
 
 **Deprecation Policy:**
+
 - Minimum 6 months notice
 - Versioned endpoints run in parallel
 - Clear migration guides
@@ -404,10 +443,11 @@ if (req.features.isEnabled('ml_recommendations')) {
 #### Response Format
 
 **Success Response:**
+
 ```json
 {
   "success": true,
-  "data": { },
+  "data": {},
   "metadata": {
     "requestId": "uuid",
     "timestamp": "ISO-8601",
@@ -417,6 +457,7 @@ if (req.features.isEnabled('ml_recommendations')) {
 ```
 
 **Error Response:**
+
 ```json
 {
   "success": false,
@@ -447,6 +488,7 @@ if (req.features.isEnabled('ml_recommendations')) {
 #### Zero-Downtime Deployments
 
 **Blue-Green Strategy:**
+
 1. Deploy new version alongside old
 2. Run health checks
 3. Gradually shift traffic
@@ -454,6 +496,7 @@ if (req.features.isEnabled('ml_recommendations')) {
 5. Keep old version for instant rollback
 
 **Rolling Updates:**
+
 1. Update 10% of instances
 2. Wait for health checks
 3. Monitor SLOs
@@ -463,6 +506,7 @@ if (req.features.isEnabled('ml_recommendations')) {
 #### Health Check Configuration
 
 **Kubernetes Example:**
+
 ```yaml
 livenessProbe:
   httpGet:
@@ -470,7 +514,7 @@ livenessProbe:
     port: 3000
   initialDelaySeconds: 10
   periodSeconds: 10
-  
+
 readinessProbe:
   httpGet:
     path: /health
@@ -482,6 +526,7 @@ readinessProbe:
 #### Database Migrations
 
 **Best Practices:**
+
 - Always backwards compatible
 - Separate data/schema migrations
 - Test rollback procedures
@@ -495,6 +540,7 @@ readinessProbe:
 #### Recommended Alerts
 
 **Critical (Page immediately):**
+
 - Availability < 99.9% over 5 minutes
 - Error rate > 1% over 5 minutes
 - P99 latency > 5s
@@ -502,6 +548,7 @@ readinessProbe:
 - Error budget exhausted
 
 **Warning (Investigate during business hours):**
+
 - Availability < 99.95%
 - Error rate > 0.1%
 - P99 latency > 1s
@@ -509,6 +556,7 @@ readinessProbe:
 - CPU usage > 70%
 
 **Info:**
+
 - Deployment started/completed
 - Feature flag changed
 - Configuration updated
@@ -516,6 +564,7 @@ readinessProbe:
 #### Grafana Dashboards
 
 **Sample Dashboard Panels:**
+
 1. **Request Rate** - Requests per second
 2. **Error Rate** - Errors per second
 3. **Latency** - P50, P95, P99 heatmap
@@ -539,6 +588,7 @@ readinessProbe:
 #### Security Compliance
 
 **OWASP Top 10:**
+
 - ✅ Injection Prevention (parameterized queries)
 - ✅ Broken Authentication (optional API keys)
 - ✅ Sensitive Data Exposure (no secrets in logs)
@@ -553,6 +603,7 @@ readinessProbe:
 #### Audit Trail
 
 All operations logged with:
+
 - Who (API key / IP)
 - What (operation)
 - When (timestamp)
@@ -672,10 +723,11 @@ ISC License - Free for commercial and personal use.
 
 **Why we built this:**
 
-We believe communities deserve enterprise-grade tools without enterprise costs. This project proves open-source can meet the highest standards of reliability, security, and observability.
+We believe communities deserve enterprise-grade tools without enterprise costs. This project proves
+open-source can meet the highest standards of reliability, security, and observability.
 
 ---
 
 **Built with ❤️ for the open-source community**
 
-*Enterprise features. Community values. Always free.*
+_Enterprise features. Community values. Always free._

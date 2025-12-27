@@ -17,19 +17,23 @@ describe('AI Enrichment Service', () => {
     it('should enrich book with Gemini (first provider)', async () => {
       const mockResponse = {
         data: {
-          candidates: [{
-            content: {
-              parts: [{
-                text: JSON.stringify({
-                  title: 'The Great Gatsby',
-                  author: 'F. Scott Fitzgerald',
-                  genre: 'Classic Fiction',
-                  publisher: 'Scribner',
-                  description: 'A novel set in the Jazz Age...',
-                }),
-              }],
+          candidates: [
+            {
+              content: {
+                parts: [
+                  {
+                    text: JSON.stringify({
+                      title: 'The Great Gatsby',
+                      author: 'F. Scott Fitzgerald',
+                      genre: 'Classic Fiction',
+                      publisher: 'Scribner',
+                      description: 'A novel set in the Jazz Age...',
+                    }),
+                  },
+                ],
+              },
             },
-          }],
+          ],
         },
       };
 
@@ -50,13 +54,15 @@ describe('AI Enrichment Service', () => {
     it('should fallback to Claude when Gemini fails', async () => {
       const claudeResponse = {
         data: {
-          content: [{
-            text: JSON.stringify({
-              title: 'To Kill a Mockingbird',
-              author: 'Harper Lee',
-              genre: 'Fiction',
-            }),
-          }],
+          content: [
+            {
+              text: JSON.stringify({
+                title: 'To Kill a Mockingbird',
+                author: 'Harper Lee',
+                genre: 'Fiction',
+              }),
+            },
+          ],
         },
       };
 
@@ -77,15 +83,17 @@ describe('AI Enrichment Service', () => {
     it('should fallback to OpenAI when Gemini and Claude fail', async () => {
       const openaiResponse = {
         data: {
-          choices: [{
-            message: {
-              content: JSON.stringify({
-                title: '1984',
-                author: 'George Orwell',
-                genre: 'Dystopian Fiction',
-              }),
+          choices: [
+            {
+              message: {
+                content: JSON.stringify({
+                  title: '1984',
+                  author: 'George Orwell',
+                  genre: 'Dystopian Fiction',
+                }),
+              },
             },
-          }],
+          ],
         },
       };
 
@@ -118,13 +126,17 @@ describe('AI Enrichment Service', () => {
     it('should parse JSON from markdown code blocks', async () => {
       const mockResponse = {
         data: {
-          candidates: [{
-            content: {
-              parts: [{
-                text: '```json\n{"title": "Test Book", "author": "Test Author"}\n```',
-              }],
+          candidates: [
+            {
+              content: {
+                parts: [
+                  {
+                    text: '```json\n{"title": "Test Book", "author": "Test Author"}\n```',
+                  },
+                ],
+              },
             },
-          }],
+          ],
         },
       };
 
@@ -140,13 +152,17 @@ describe('AI Enrichment Service', () => {
     it('should handle malformed JSON gracefully', async () => {
       const mockResponse = {
         data: {
-          candidates: [{
-            content: {
-              parts: [{
-                text: '{ title: invalid json }',
-              }],
+          candidates: [
+            {
+              content: {
+                parts: [
+                  {
+                    text: '{ title: invalid json }',
+                  },
+                ],
+              },
             },
-          }],
+          ],
         },
       };
 
@@ -164,9 +180,11 @@ describe('AI Enrichment Service', () => {
 
       const mockResponse = {
         data: {
-          data: [{
-            url: 'https://example.com/generated-cover.png',
-          }],
+          data: [
+            {
+              url: 'https://example.com/generated-cover.png',
+            },
+          ],
         },
       };
 
@@ -217,13 +235,17 @@ describe('AI Enrichment Service', () => {
     it('should try cheapest provider first (Gemini)', async () => {
       const mockResponse = {
         data: {
-          candidates: [{
-            content: {
-              parts: [{
-                text: JSON.stringify({ title: 'Book' }),
-              }],
+          candidates: [
+            {
+              content: {
+                parts: [
+                  {
+                    text: JSON.stringify({ title: 'Book' }),
+                  },
+                ],
+              },
             },
-          }],
+          ],
         },
       };
 
@@ -239,11 +261,13 @@ describe('AI Enrichment Service', () => {
 
       const mockResponse = {
         data: {
-          choices: [{
-            message: {
-              content: JSON.stringify({ title: 'Book' }),
+          choices: [
+            {
+              message: {
+                content: JSON.stringify({ title: 'Book' }),
+              },
             },
-          }],
+          ],
         },
       };
 
