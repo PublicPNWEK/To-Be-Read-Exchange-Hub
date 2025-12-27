@@ -184,7 +184,7 @@ function buildErrorResponse(errors, context = {}) {
   return {
     success: false,
     error: 'Validation failed',
-    errors: errors.map(err => typeof err === 'string' ? { message: err } : err),
+    errors: errors.map((err) => (typeof err === 'string' ? { message: err } : err)),
     context,
   };
 }

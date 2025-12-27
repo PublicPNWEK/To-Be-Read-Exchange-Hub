@@ -1,16 +1,23 @@
 # 📚 To-Be-Read Exchange Hub
 
-Enterprise-grade open source book exchange & inventory system with smart enrichment, resilient architecture, and production hardening you normally only see in paid platforms.
+Enterprise-grade open source book exchange & inventory system with smart enrichment, resilient
+architecture, and production hardening you normally only see in paid platforms.
 
-[![Tests](https://img.shields.io/badge/Tests-Passing-brightgreen)](./TEST-RESULTS.md) [![Coverage](https://img.shields.io/badge/Coverage-88%25-blue)](./coverage/lcov-report/index.html) [![Lint](https://img.shields.io/badge/Lint-Clean-success)](./eslint.config.mjs)
+[![Tests](https://img.shields.io/badge/Tests-Passing-brightgreen)](./TEST-RESULTS.md)
+[![Coverage](https://img.shields.io/badge/Coverage-88%25-blue)](./coverage/lcov-report/index.html)
+[![Lint](https://img.shields.io/badge/Lint-Clean-success)](./eslint.config.mjs)
 
-[![99.9% SLO](https://img.shields.io/badge/SLO-99.9%25%20Availability-success)](./ENTERPRISE.md) [![Observability](https://img.shields.io/badge/Observability-Prometheus%20%2B%20Structured%20Logs-blue)](./ENTERPRISE.md) [![Security](https://img.shields.io/badge/Security-OWASP%20Hardened-green)](./ENTERPRISE.md)
+[![99.9% SLO](https://img.shields.io/badge/SLO-99.9%25%20Availability-success)](./ENTERPRISE.md)
+[![Observability](https://img.shields.io/badge/Observability-Prometheus%20%2B%20Structured%20Logs-blue)](./ENTERPRISE.md)
+[![Security](https://img.shields.io/badge/Security-OWASP%20Hardened-green)](./ENTERPRISE.md)
 
-> Built for communities that need reliability without vendor lock‑in. Clinical startup discipline + hobby project heart.
+> Built for communities that need reliability without vendor lock‑in. Clinical startup discipline +
+> hobby project heart.
 
 ## 🔑 Core Value (Why it's Different)
 
-Production practices (graceful shutdown, circuit breakers, metrics, SLO tracking, feature flags, API key auth, input sanitization) already wired in — no "rewrite for prod" tax later.
+Production practices (graceful shutdown, circuit breakers, metrics, SLO tracking, feature flags, API
+key auth, input sanitization) already wired in — no "rewrite for prod" tax later.
 
 ## 🚀 One-Line Installation (Fastest Way)
 
@@ -48,7 +55,8 @@ Full walkthrough: [QUICKSTART.md](QUICKSTART.md)
 - Security: hardened headers (Helmet), API key layer, deep sanitization
 - Feature flags for safe progressive delivery
 
-Full enterprise rationale & patterns: `ENTERPRISE.md` • Architecture & internals: `IMPLEMENTATION.md`.
+Full enterprise rationale & patterns: `ENTERPRISE.md` • Architecture & internals:
+`IMPLEMENTATION.md`.
 
 ## 🛠 Prerequisites (Local Path)
 
@@ -74,30 +82,33 @@ We aggressively trimmed first-run friction. Planned next tweaks:
 - Combine env creation + DB init under a single `bootstrap` script.
 - Use `npm ci` when lockfile present for faster deterministic installs.
 - Parallelize DB schema + dependency install where shell supports (`&` background).
-- Auto-detect missing PostgreSQL and fallback to ephemeral Docker postgres (`npm run bootstrap -- --ephemeral-db`).
+- Auto-detect missing PostgreSQL and fallback to ephemeral Docker postgres
+  (`npm run bootstrap -- --ephemeral-db`).
 - Cache build layers in Dockerfile (multi-stage already partially supported — see upcoming PR).
 
 ## 📜 Essential Scripts
 
-| Action | Command | Notes |
-| ------ | ------- | ----- |
-| Guided setup | `npm run go` | Interactive bootstrap (Docker vs local) |
-| Full setup | `npm run setup` | Unified bootstrap (env + deps + optional DB + tests) |
-| DB init | `npm run db:init` | Idempotent schema + seed roles/permissions |
-| Dev mode | `npm run dev` | Nodemon autoreload |
-| Tests | `npm test` | Coverage ≥ 88% (functions > 90%) |
-| Verify | `npm run verify` | Lint + format check + tests |
-| Start (prod) | `npm start` | Smart start w/ health polling |
-| Stop | `npm run stop` | Graceful shutdown |
+| Action       | Command           | Notes                                                |
+| ------------ | ----------------- | ---------------------------------------------------- |
+| Guided setup | `npm run go`      | Interactive bootstrap (Docker vs local)              |
+| Full setup   | `npm run setup`   | Unified bootstrap (env + deps + optional DB + tests) |
+| DB init      | `npm run db:init` | Idempotent schema + seed roles/permissions           |
+| Dev mode     | `npm run dev`     | Nodemon autoreload                                   |
+| Tests        | `npm test`        | Coverage ≥ 88% (functions > 90%)                     |
+| Verify       | `npm run verify`  | Lint + format check + tests                          |
+| Start (prod) | `npm start`       | Smart start w/ health polling                        |
+| Stop         | `npm run stop`    | Graceful shutdown                                    |
 
 ## 🧪 Quality Snapshot (Oct 2025)
 
-Coverage: Statements 88.6% • Branches 82.5% • Functions 91.7% • Lines 88.5%.
-Resilience & security layers covered by dedicated tests (graceful shutdown, circuit breaker transitions, header & sanitization, feature flag parsing).
+Coverage: Statements 88.6% • Branches 82.5% • Functions 91.7% • Lines 88.5%. Resilience & security
+layers covered by dedicated tests (graceful shutdown, circuit breaker transitions, header &
+sanitization, feature flag parsing).
 
 ## 🔍 API & Docs
 
-Swagger UI at `/api-docs` (live schemas + try-it). Prometheus metrics at `/metrics`. SLO status at `/api/slo`. Feature flags at `/api/features`.
+Swagger UI at `/api-docs` (live schemas + try-it). Prometheus metrics at `/metrics`. SLO status at
+`/api/slo`. Feature flags at `/api/features`.
 
 ## 🧱 Database Shape (High Level)
 
@@ -111,11 +122,13 @@ Read `CONTRIBUTING.md` then run:
 npm run verify
 ```
 
-Open issues for roadmap items (RBAC extension, sales flow, tracing exporters). We welcome focused improvements over broad rewrites.
+Open issues for roadmap items (RBAC extension, sales flow, tracing exporters). We welcome focused
+improvements over broad rewrites.
 
 ## 📄 License
 
 ISC — permissive use. Attribution appreciated but not required.
+
 - **Web Interface:** `http://localhost:3000`
 - **Health Check:** `http://localhost:3000/health` (returns `{"status":"ok"}`)
 - **DB Health Check:** `http://localhost:3000/api/health/db` (returns
@@ -123,10 +136,14 @@ ISC — permissive use. Attribution appreciated but not required.
 
 ## 🔗 Deep Dive References
 
-`ENTERPRISE.md` • `IMPLEMENTATION.md` • `QUICKSTART.md` • `SECURITY-STATUS.md` • `STABILITY-REPORT.md`
+`ENTERPRISE.md` • `IMPLEMENTATION.md` • `QUICKSTART.md` • `SECURITY-STATUS.md` •
+`STABILITY-REPORT.md`
 
 ---
-Lean README by design — everything else lives in specialized docs. If something feels missing here, it probably has its own file.
+
+Lean README by design — everything else lives in specialized docs. If something feels missing here,
+it probably has its own file.
+
 ### Environment Variables
 
 | Variable               | Description                                  | Default          |
@@ -188,7 +205,7 @@ Creates a new book with smart inventory logic and automatic data enrichment.
 
 **Request Body:**
 
-```json
+````json
 {
   "isbn": "9780747532743", // Required (if title not provided)
   "title": "Harry Potter...", // Required (if ISBN not provided)
@@ -237,14 +254,15 @@ nano .env         # set DB_PASSWORD (change default!)
 
 # (C) Docker one-liner
 docker compose up -d --build
-```
+````
 
-Visit: `http://localhost:3000` (UI) • `/api-docs` (Swagger) • `/api/health` (health JSON)
-Vintage seed flag: `--seed-vintage` loads curated classic titles (see `scripts/lib/seed-vintage.sql`).
+Visit: `http://localhost:3000` (UI) • `/api-docs` (Swagger) • `/api/health` (health JSON) Vintage
+seed flag: `--seed-vintage` loads curated classic titles (see `scripts/lib/seed-vintage.sql`).
 
 ## ✅ Prerequisites (Local Path Only)
 
-Node.js ≥18 (tested on 20 LTS) • PostgreSQL ≥12 • npm (bundled). For container/Docker users, these are already handled.
+Node.js ≥18 (tested on 20 LTS) • PostgreSQL ≥12 • npm (bundled). For container/Docker users, these
+are already handled.
 
 ## ⚙️ Essential Configuration
 
@@ -261,13 +279,15 @@ DB_PASSWORD=CHANGE_ME
 DB_PORT=5432
 ```
 
-Security tips: never commit `.env`; always replace default password; use `NODE_ENV=production` in prod.
+Security tips: never commit `.env`; always replace default password; use `NODE_ENV=production` in
+prod.
 
 ## 🧠 Smart Inventory + Enrichment (Quick View)
 
 - Shelf auto = first letter of author last name; section increments per shelf.
 - Manual override accepts `A-12`, `A`, or `Shelf A, Section 12`.
-- ISBN triggers enrichment → merges title/author/publisher/description/cover from multiple sources with graceful fallback.
+- ISBN triggers enrichment → merges title/author/publisher/description/cover from multiple sources
+  with graceful fallback.
 
 ## 🛠️ Common Scripts
 
@@ -284,7 +304,9 @@ npm run verify     # lint + format:check + tests
 
 ## 🔍 API & Documentation
 
-Interactive Swagger: `/api-docs`. Core endpoints: `/api/books`, `/api/books/bulk`, `/api/sync/pingo`, `/api/health`, `/metrics`. For full request/response examples consult Swagger or `tests/*.test.js`.
+Interactive Swagger: `/api-docs`. Core endpoints: `/api/books`, `/api/books/bulk`,
+`/api/sync/pingo`, `/api/health`, `/metrics`. For full request/response examples consult Swagger or
+`tests/*.test.js`.
 
 ## 🏗️ Structure (Condensed)
 
@@ -303,7 +325,8 @@ tests/               # 70+ unit/integration suites
 
 ## 🧪 Quality Snapshot
 
-Statements ~88% • Functions >91% • Resilience, security & shutdown flows covered. See `TEST-RESULTS.md` & coverage/ for details.
+Statements ~88% • Functions >91% • Resilience, security & shutdown flows covered. See
+`TEST-RESULTS.md` & coverage/ for details.
 
 ## 🔐 Production Fast Checklist
 
@@ -315,7 +338,8 @@ Statements ~88% • Functions >91% • Resilience, security & shutdown flows cov
 
 ## 🤝 Contributing
 
-Fork → branch → changes + tests → `npm run verify` → PR. High‑signal improvements welcome (tests/docs/perf/security). See `CONTRIBUTING.md`.
+Fork → branch → changes + tests → `npm run verify` → PR. High‑signal improvements welcome
+(tests/docs/perf/security). See `CONTRIBUTING.md`.
 
 ## 📄 License (ISC)
 

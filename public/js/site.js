@@ -1,19 +1,22 @@
 // public/js/site.js
 // Fetches public site content and populates landing page sections.
-(async function() {
+(async function () {
   const businessInfoEl = document.getElementById('businessInfoContent');
   const affiliateListEl = document.getElementById('affiliateLinksList');
   const policyEl = document.getElementById('policyContent');
   const editPolicyLink = document.getElementById('editPolicyLink');
   const accountPanel = document.getElementById('accountPanel');
 
-  function escapeHtml(str){
-    return str.replace(/[&<>\"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  function escapeHtml(str) {
+    return str.replace(
+      /[&<>\"]/g,
+      (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]
+    );
   }
 
-  async function fetchJSON(url, opts={}) {
+  async function fetchJSON(url, opts = {}) {
     const res = await fetch(url, opts);
-    if(!res.ok) throw new Error('Request failed: '+res.status);
+    if (!res.ok) throw new Error('Request failed: ' + res.status);
     return res.json();
   }
 
@@ -27,15 +30,20 @@
         <strong>${name || ''}</strong><br/>
         <em>${tagline || ''}</em><br/>
         <div>${address || ''}</div>
-        <div>${hours ? 'Hours: '+escapeHtml(hours) : ''}</div>
-        <div>${phone ? 'Phone: '+escapeHtml(phone) : ''}</div>
+        <div>${hours ? 'Hours: ' + escapeHtml(hours) : ''}</div>
+        <div>${phone ? 'Phone: ' + escapeHtml(phone) : ''}</div>
         <div>${email ? 'Email: <a href="mailto:${escapeHtml(email)}">${escapeHtml(email)}</a>' : ''}</div>
         ${google_business_url ? `<div><a href="${google_business_url}" target="_blank" rel="noopener">Google Business Page</a></div>` : ''}
       `;
     }
 
     if (Array.isArray(affiliate_links) && affiliateListEl) {
-      affiliateListEl.innerHTML = affiliate_links.map(l => `<li><a href="${l.url}" target="_blank" rel="noopener">${l.label || l.url}</a></li>`).join('');
+      affiliateListEl.innerHTML = affiliate_links
+        .map(
+          (l) =>
+            `<li><a href="${l.url}" target="_blank" rel="noopener">${l.label || l.url}</a></li>`
+        )
+        .join('');
     }
 
     if (policyEl && exchange_policy_html) {
@@ -58,12 +66,16 @@
           editPolicyLink.style.display = 'inline';
         }
       } else if (accountPanel) {
-        accountPanel.innerHTML = '<p><a href="/login.html">Sign In</a> or <a href="/register.html">Register</a></p>';
+        accountPanel.innerHTML =
+          '<p><a href="/login.html">Sign In</a> or <a href="/register.html">Register</a></p>';
       }
     } else if (accountPanel) {
-      accountPanel.innerHTML = '<p><a href="/login.html">Sign In</a> or <a href="/register.html">Register</a></p>';
+      accountPanel.innerHTML =
+        '<p><a href="/login.html">Sign In</a> or <a href="/register.html">Register</a></p>';
     }
   } catch (e) {
-    if (accountPanel) accountPanel.innerHTML = '<p><a href="/login.html">Sign In</a> or <a href="/register.html">Register</a></p>';
+    if (accountPanel)
+      accountPanel.innerHTML =
+        '<p><a href="/login.html">Sign In</a> or <a href="/register.html">Register</a></p>';
   }
 })();
