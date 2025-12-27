@@ -9,7 +9,7 @@ const logger = require('../utils/logger');
  * Prevents malicious files disguised with wrong extensions
  */
 function validateFileMagicNumber(buffer, mimetype) {
-  if (!buffer || buffer.length < 12) {
+  if (!buffer || buffer.length === 0) {
     return false;
   }
 
@@ -17,12 +17,12 @@ function validateFileMagicNumber(buffer, mimetype) {
   const signatures = {
     // JPEG
     'image/jpeg': [
-      [0xFF, 0xD8, 0xFF, 0xE0], // JFIF
-      [0xFF, 0xD8, 0xFF, 0xE1], // Exif
-      [0xFF, 0xD8, 0xFF, 0xDB], // JPEG raw
+      [0xff, 0xd8, 0xff, 0xe0], // JFIF
+      [0xff, 0xd8, 0xff, 0xe1], // Exif
+      [0xff, 0xd8, 0xff, 0xdb], // JPEG raw
     ],
     // PNG
-    'image/png': [[0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]],
+    'image/png': [[0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]],
     // WebP
     'image/webp': [[0x52, 0x49, 0x46, 0x46]], // "RIFF" at start, "WEBP" at offset 8
     // CSV (text file - starts with printable ASCII)
@@ -35,17 +35,20 @@ function validateFileMagicNumber(buffer, mimetype) {
   if (mimetype === 'text/csv' || mimetype === 'application/json') {
     // Check if first bytes are printable ASCII or UTF-8 BOM
     const firstByte = buffer[0];
-    
-    // UTF-8 BOM
-    if (firstByte === 0xEF && buffer[1] === 0xBB && buffer[2] === 0xBF) {
+
+    // UTF-8 BOM (requires 3 bytes)
+    if (buffer.length >= 3 && firstByte === 0xef && buffer[1] === 0xbb && buffer[2] === 0xbf) {
       return true;
     }
 
     // Printable ASCII (space to ~) or common punctuation
-    if ((firstByte >= 0x20 && firstByte <= 0x7E) ||
-        firstByte === 0x09 || // tab
-        firstByte === 0x0A || // newline
-        firstByte === 0x0D) { // carriage return
+    if (
+      (firstByte >= 0x20 && firstByte <= 0x7e) ||
+      firstByte === 0x09 || // tab
+      firstByte === 0x0a || // newline
+      firstByte === 0x0d
+    ) {
+      // carriage return
       return true;
     }
 
@@ -59,7 +62,11 @@ function validateFileMagicNumber(buffer, mimetype) {
   }
 
   // Check if buffer starts with any of the expected signatures
-  return expectedSignatures.some(signature => {
+  return expectedSignatures.some((signature) => {
+    // Only check if buffer is long enough for this signature
+    if (buffer.length < signature.length) {
+      return false;
+    }
     return signature.every((byte, index) => buffer[index] === byte);
   });
 }
@@ -69,11 +76,11 @@ function validateFileMagicNumber(buffer, mimetype) {
  */
 function sanitizeCSVContent(content) {
   const lines = content.split('\n');
-  const sanitizedLines = lines.map(line => {
+  const sanitizedLines = lines.map((line) => {
     // Remove any formula injection attempts
     // CSV formulas start with =, +, -, @, |, %
     const cells = line.split(',');
-    const sanitizedCells = cells.map(cell => {
+    const sanitizedCells = cells.map((cell) => {
       let sanitized = cell.trim();
 
       // If cell starts with dangerous characters, prepend single quote
@@ -110,7 +117,7 @@ class BatchRateLimiter {
     const userRequests = this.requests.get(userId) || [];
 
     // Remove expired timestamps
-    const validRequests = userRequests.filter(timestamp => now - timestamp < this.windowMs);
+    const validRequests = userRequests.filter((timestamp) => now - timestamp < this.windowMs);
 
     if (validRequests.length >= this.maxRequests) {
       const oldestRequest = Math.min(...validRequests);
@@ -210,13 +217,13 @@ function validateApiKey(apiKey) {
 function sanitizeFilename(filename) {
   // Remove directory traversal attempts
   let sanitized = filename.replace(/\.\./g, '');
-  
+
   // Remove path separators
   sanitized = sanitized.replace(/[\/\\]/g, '');
-  
+
   // Remove null bytes
   sanitized = sanitized.replace(/\0/g, '');
-  
+
   // Limit to safe characters
   sanitized = sanitized.replace(/[^a-zA-Z0-9._-]/g, '_');
 
@@ -269,7 +276,7 @@ function detectSQLInjection(input) {
     /(\bAND\b\s+\d+\s*=\s*\d+)/gi,
   ];
 
-  return sqlPatterns.some(pattern => pattern.test(input));
+  return sqlPatterns.some((pattern) => pattern.test(input));
 }
 
 module.exports = {

@@ -193,22 +193,20 @@ app.get('/health', (req, res) => {
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
   const logger = require('./utils/logger');
-  
+
   // Log with correlation ID
   if (req.log) {
     req.log.error({ err, path: req.path, method: req.method }, 'Unhandled error');
   } else {
     logger.error('Unhandled error: %s', err.stack || err);
   }
-  
+
   // Track SLO
   sloMonitor.recordRequest(0, true);
-  
+
   // Don't leak internal errors in production
-  const message = process.env.NODE_ENV === 'production' 
-    ? 'Internal server error' 
-    : err.message;
-  
+  const message = process.env.NODE_ENV === 'production' ? 'Internal server error' : err.message;
+
   res.status(err.status || 500).json({
     success: false,
     error: 'Something went wrong!',
@@ -221,18 +219,21 @@ app.use((err, req, res, next) => {
 if (require.main === module) {
   const server = app.listen(PORT, () => {
     const logger = require('./utils/logger');
-    logger.info({
-      port: PORT,
-      environment: process.env.NODE_ENV,
-      nodeVersion: process.version,
-      features: featureFlags.getAllFlags(),
-    }, 'Server started successfully');
+    logger.info(
+      {
+        port: PORT,
+        environment: process.env.NODE_ENV,
+        nodeVersion: process.version,
+        features: featureFlags.getAllFlags(),
+      },
+      'Server started successfully'
+    );
   });
 
   // Setup graceful shutdown
   const GracefulShutdown = require('./utils/gracefulShutdown');
   const shutdown = new GracefulShutdown(server, pool);
-  
+
   // Add shutdown check to health endpoint
   app.use(shutdown.healthCheckMiddleware());
 }
