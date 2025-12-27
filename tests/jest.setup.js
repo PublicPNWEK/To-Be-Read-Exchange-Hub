@@ -24,6 +24,5 @@ jest.mock('uuid', () => ({
 // NOTE: Database is NOT mocked globally - individual tests should mock as needed
 // Example: jest.mock('../src/config/database', () => ({ query: jest.fn() }))
 
-
 // Removed mock for gracefulShutdown to allow real implementation tests to run in CI.
 // process.exit guarded inside implementation when NODE_ENV==='test'.

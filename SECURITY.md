@@ -24,7 +24,8 @@ This project implements enterprise-grade security practices:
 
 ## Reporting a Vulnerability
 
-We take security seriously and appreciate responsible disclosure. If you discover a security vulnerability, please follow these steps:
+We take security seriously and appreciate responsible disclosure. If you discover a security
+vulnerability, please follow these steps:
 
 ### For Critical Vulnerabilities
 
@@ -39,7 +40,8 @@ We take security seriously and appreciate responsible disclosure. If you discove
    - Affected versions
    - Your contact information (optional, for acknowledgment)
 
-We will acknowledge your report within **48 hours** and provide a detailed response within **5 business days** with next steps.
+We will acknowledge your report within **48 hours** and provide a detailed response within **5
+business days** with next steps.
 
 ### For Non-Critical Issues
 
@@ -51,14 +53,14 @@ For lower-severity issues (configuration recommendations, non-exploitable edge c
 
 ## Response Timeline
 
-| Stage | Timeline |
-|-------|----------|
-| Initial acknowledgment | 48 hours |
-| Severity assessment | 5 business days |
-| Fix development (Critical) | 7 days |
-| Fix development (High) | 14 days |
-| Fix development (Medium/Low) | 30 days |
-| Public disclosure | After fix is deployed + 7 days |
+| Stage                        | Timeline                       |
+| ---------------------------- | ------------------------------ |
+| Initial acknowledgment       | 48 hours                       |
+| Severity assessment          | 5 business days                |
+| Fix development (Critical)   | 7 days                         |
+| Fix development (High)       | 14 days                        |
+| Fix development (Medium/Low) | 30 days                        |
+| Public disclosure            | After fix is deployed + 7 days |
 
 ## Security Update Process
 
@@ -119,7 +121,8 @@ LOG_LEVEL=warn                     # Reduce info leakage
 We recognize and thank security researchers who responsibly disclose vulnerabilities:
 
 <!-- Will be populated as reports are received -->
-- *No reports received yet*
+
+- _No reports received yet_
 
 ## Compliance & Standards
 
@@ -142,4 +145,4 @@ Thank you to all security researchers who help keep this project safe!
 
 ---
 
-*Last updated: October 30, 2025*
+_Last updated: October 30, 2025_

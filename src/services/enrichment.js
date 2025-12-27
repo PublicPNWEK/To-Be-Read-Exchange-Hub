@@ -51,7 +51,7 @@ async function enrichBookData(isbn, options = {}) {
     try {
       logger.info(`Traditional APIs incomplete, attempting AI enrichment for ISBN: ${isbn}`);
       const aiData = await enrichWithAI({ isbn, ...options });
-      
+
       if (aiData) {
         enrichedData.title = enrichedData.title || aiData.title;
         enrichedData.author = enrichedData.author || aiData.author;

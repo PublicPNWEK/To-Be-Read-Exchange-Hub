@@ -1,7 +1,7 @@
 name: 🔒 Security Vulnerability
 description: Report a security vulnerability (PRIVATE - will be handled confidentially)
-title: "[SECURITY] "
-labels: ["security", "triage"]
+title: '[SECURITY] '
+labels: ['security', 'triage']
 assignees: []
 
 body:
@@ -9,7 +9,7 @@ body:
     attributes:
       value: |
         ⚠️ **IMPORTANT**: If this is a critical vulnerability, please report it privately via email to security@example.com instead of opening a public issue.
-        
+
         For less critical issues, please continue with this form.
 
   - type: textarea
@@ -60,7 +60,7 @@ body:
       placeholder: |
         - File/Module: 
         - Endpoint/Route: 
-        - Version: 
+        - Version:
     validations:
       required: true
 
@@ -86,7 +86,7 @@ body:
       value: |
         - Version: 
         - Deployment: 
-        - Configuration: 
+        - Configuration:
 
   - type: checkboxes
     id: disclosure
