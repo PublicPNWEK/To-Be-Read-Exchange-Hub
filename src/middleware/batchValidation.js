@@ -33,10 +33,13 @@ function validateBatchUpload(req, res, next) {
     for (const imageFile of uploadedFiles.images) {
       const imageValidation = validateFileUpload(imageFile);
       if (imageValidation.length > 0) {
-        logger.warn('Image validation failed', { file: imageFile.originalname, errors: imageValidation });
-        return res.status(400).json(
-          buildErrorResponse(imageValidation, { file: imageFile.originalname })
-        );
+        logger.warn('Image validation failed', {
+          file: imageFile.originalname,
+          errors: imageValidation,
+        });
+        return res
+          .status(400)
+          .json(buildErrorResponse(imageValidation, { file: imageFile.originalname }));
       }
     }
 
@@ -68,11 +71,13 @@ function validateBooks(books) {
     const errors = validateBookData(book, rowNumber);
 
     if (errors.length > 0) {
-      validationErrors.push(...errors.map(err => ({
-        row: rowNumber,
-        error: err,
-        isbn: book.isbn || null,
-      })));
+      validationErrors.push(
+        ...errors.map((err) => ({
+          row: rowNumber,
+          error: err,
+          isbn: book.isbn || null,
+        }))
+      );
     } else {
       sanitizedBooks.push(sanitizeBookData(book));
     }
@@ -108,7 +113,7 @@ async function enrichWithRetry(enrichFunction, bookData, maxRetries = 3) {
       // Exponential backoff: 1s, 2s, 4s
       if (attempt < maxRetries) {
         const delay = Math.pow(2, attempt - 1) * 1000;
-        await new Promise(resolve => setTimeout(resolve, delay));
+        await new Promise((resolve) => setTimeout(resolve, delay));
       }
     }
   }
@@ -142,7 +147,7 @@ function sanitizeError(error) {
  * Format validation errors for response
  */
 function formatValidationErrors(errors) {
-  return errors.map(err => {
+  return errors.map((err) => {
     if (typeof err === 'string') {
       return { message: err };
     }

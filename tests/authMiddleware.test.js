@@ -19,9 +19,13 @@ describe('Auth middleware', () => {
   test('authenticate attaches user with valid token', async () => {
     const secret = process.env.JWT_SECRET || 'dev-insecure-secret-change-me';
     const token = jwt.sign({ sub: 1, email: 'test@example.com' }, secret, { expiresIn: '1h' });
-    pool.query.mockResolvedValueOnce({ rows: [{ id: 1, email: 'test@example.com', display_name: 'Test', is_active: true }] });
+    pool.query.mockResolvedValueOnce({
+      rows: [{ id: 1, email: 'test@example.com', display_name: 'Test', is_active: true }],
+    });
     pool.query.mockResolvedValueOnce({ rows: [{ name: 'admin' }] });
-    pool.query.mockResolvedValueOnce({ rows: [{ code: 'INVENTORY_READ' }, { code: 'INVENTORY_WRITE' }] });
+    pool.query.mockResolvedValueOnce({
+      rows: [{ code: 'INVENTORY_READ' }, { code: 'INVENTORY_WRITE' }],
+    });
     const req = { headers: { authorization: `Bearer ${token}` } };
     const res = {};
     const next = jest.fn();
@@ -46,6 +50,9 @@ describe('Auth middleware', () => {
     const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
     authorize('INVENTORY_WRITE')(req, res, () => {});
     expect(res.status).toHaveBeenCalledWith(403);
-    expect(res.json).toHaveBeenCalledWith({ success: false, error: 'Forbidden: insufficient permissions' });
+    expect(res.json).toHaveBeenCalledWith({
+      success: false,
+      error: 'Forbidden: insufficient permissions',
+    });
   });
 });

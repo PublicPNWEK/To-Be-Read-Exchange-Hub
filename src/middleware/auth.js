@@ -12,18 +12,34 @@ async function authenticate(req, res, next) {
   const token = authHeader.substring(7);
   try {
     const payload = jwt.verify(token, JWT_SECRET);
-    const userResult = await pool.query('SELECT id, email, display_name, is_active FROM users WHERE id=$1', [payload.sub]);
+    const userResult = await pool.query(
+      'SELECT id, email, display_name, is_active FROM users WHERE id=$1',
+      [payload.sub]
+    );
     const user = userResult.rows[0];
     if (!user || !user.is_active) {
       return res.status(401).json({ success: false, error: 'Invalid user' });
     }
-    const rolesResult = await pool.query('SELECT r.name FROM roles r JOIN user_roles ur ON r.id=ur.role_id WHERE ur.user_id=$1', [user.id]);
-    const roles = rolesResult.rows.map(r => r.name);
-    const permsResult = await pool.query('SELECT p.code FROM permissions p JOIN role_permissions rp ON p.id=rp.permission_id JOIN roles r ON r.id=rp.role_id JOIN user_roles ur ON ur.role_id = r.id WHERE ur.user_id=$1', [user.id]);
-    const permissions = permsResult.rows.map(p => p.code);
-    req.user = { id: user.id, email: user.email, display_name: user.display_name, roles, permissions };
+    const rolesResult = await pool.query(
+      'SELECT r.name FROM roles r JOIN user_roles ur ON r.id=ur.role_id WHERE ur.user_id=$1',
+      [user.id]
+    );
+    const roles = rolesResult.rows.map((r) => r.name);
+    const permsResult = await pool.query(
+      'SELECT p.code FROM permissions p JOIN role_permissions rp ON p.id=rp.permission_id JOIN roles r ON r.id=rp.role_id JOIN user_roles ur ON ur.role_id = r.id WHERE ur.user_id=$1',
+      [user.id]
+    );
+    const permissions = permsResult.rows.map((p) => p.code);
+    req.user = {
+      id: user.id,
+      email: user.email,
+      display_name: user.display_name,
+      roles,
+      permissions,
+    };
     next();
-  } catch { // ignore error detail
+  } catch {
+    // ignore error detail
     return res.status(401).json({ success: false, error: 'Invalid or expired token' });
   }
 }
@@ -35,7 +51,7 @@ function authorize(required) {
     if (!req.user) {
       return res.status(401).json({ success: false, error: 'Not authenticated' });
     }
-    const hasAll = requiredList.every(code => req.user.permissions.includes(code));
+    const hasAll = requiredList.every((code) => req.user.permissions.includes(code));
     if (!hasAll) {
       return res.status(403).json({ success: false, error: 'Forbidden: insufficient permissions' });
     }

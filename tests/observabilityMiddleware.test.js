@@ -1,4 +1,11 @@
-const { correlationId, metricsMiddleware, metricsEndpoint, trackBookOperation, trackEnrichment, updateActiveConnections, register } = require('../src/middleware/observability');
+const {
+  correlationId,
+  metricsMiddleware,
+  metricsEndpoint,
+  trackBookOperation,
+  trackEnrichment,
+  updateActiveConnections,
+} = require('../src/middleware/observability');
 const express = require('express');
 const supertest = require('supertest');
 
@@ -14,7 +21,10 @@ describe('observability middleware', () => {
 
   test('metricsMiddleware records metrics and logs', async () => {
     const app = express();
-    app.use((req, res, next) => { req.log = { info: jest.fn() }; next(); });
+    app.use((req, res, next) => {
+      req.log = { info: jest.fn() };
+      next();
+    });
     app.use(metricsMiddleware);
     app.get('/test', (req, res) => res.send('ok'));
     await supertest(app).get('/test');
