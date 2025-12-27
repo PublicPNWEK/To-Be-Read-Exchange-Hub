@@ -1,18 +1,22 @@
 const axios = require('axios');
+const { enrichWithAI, generateCoverImage } = require('./aiEnrichment');
+const logger = require('../utils/logger');
 
 /**
  * Enriches book data by fetching information from Open Library and Google Books APIs
+ * Falls back to AI enrichment if traditional APIs fail
  * @param {string} isbn - The ISBN of the book to enrich
+ * @param {Object} options - Additional book data for AI fallback
  * @returns {Promise<Object>} - Enriched book data
  */
-async function enrichBookData(isbn) {
+async function enrichBookData(isbn, options = {}) {
   const enrichedData = {
     isbn: isbn,
     title: null,
     author: null,
     publisher: null,
     description: null,
-    cover_url: null
+    cover_url: null,
   };
 
   try {
@@ -25,7 +29,7 @@ async function enrichBookData(isbn) {
       enrichedData.cover_url = enrichedData.cover_url || openLibraryData.cover_url;
     }
   } catch (error) {
-    console.error('Error fetching from Open Library:', error.message);
+    logger.error('Error fetching from Open Library: %s', error.message);
   }
 
   try {
@@ -39,7 +43,41 @@ async function enrichBookData(isbn) {
       enrichedData.cover_url = enrichedData.cover_url || googleBooksData.cover_url;
     }
   } catch (error) {
-    console.error('Error fetching from Google Books:', error.message);
+    logger.error('Error fetching from Google Books: %s', error.message);
+  }
+
+  // If still missing critical data, try AI enrichment
+  if ((!enrichedData.title || !enrichedData.author) && (isbn || options.title || options.author)) {
+    try {
+      logger.info(`Traditional APIs incomplete, attempting AI enrichment for ISBN: ${isbn}`);
+      const aiData = await enrichWithAI({ isbn, ...options });
+
+      if (aiData) {
+        enrichedData.title = enrichedData.title || aiData.title;
+        enrichedData.author = enrichedData.author || aiData.author;
+        enrichedData.publisher = enrichedData.publisher || aiData.publisher;
+        enrichedData.description = enrichedData.description || aiData.description;
+        enrichedData.genre = aiData.genre;
+        enrichedData.pages = aiData.pages;
+        enrichedData.format = aiData.format;
+        enrichedData.enrichment_source = aiData.enrichment_source;
+      }
+    } catch (aiError) {
+      logger.warn(`AI enrichment failed: ${aiError.message}`);
+    }
+  }
+
+  // If still no cover image, try AI generation
+  if (!enrichedData.cover_url && enrichedData.title && process.env.ENABLE_AI_IMAGE_GEN === 'true') {
+    try {
+      const generatedCover = await generateCoverImage(enrichedData);
+      if (generatedCover) {
+        enrichedData.cover_url = generatedCover;
+        enrichedData.enrichment_source = `${enrichedData.enrichment_source || 'api'}_ai_image`;
+      }
+    } catch (imgError) {
+      logger.warn(`AI cover generation failed: ${imgError.message}`);
+    }
   }
 
   return enrichedData;
@@ -52,9 +90,12 @@ async function enrichBookData(isbn) {
  */
 async function fetchFromOpenLibrary(isbn) {
   try {
-    const response = await axios.get(`https://openlibrary.org/api/books?bibkeys=ISBN:${isbn}&format=json&jscmd=data`, {
-      timeout: 5000
-    });
+    const response = await axios.get(
+      `https://openlibrary.org/api/books?bibkeys=ISBN:${isbn}&format=json&jscmd=data`,
+      {
+        timeout: 5000,
+      }
+    );
 
     const bookKey = `ISBN:${isbn}`;
     const bookData = response.data[bookKey];
@@ -65,12 +106,14 @@ async function fetchFromOpenLibrary(isbn) {
 
     return {
       title: bookData.title || null,
-      author: bookData.authors ? bookData.authors.map(a => a.name).join(', ') : null,
-      publisher: bookData.publishers ? bookData.publishers.map(p => p.name).join(', ') : null,
-      cover_url: bookData.cover ? (bookData.cover.large || bookData.cover.medium || bookData.cover.small) : null
+      author: bookData.authors ? bookData.authors.map((a) => a.name).join(', ') : null,
+      publisher: bookData.publishers ? bookData.publishers.map((p) => p.name).join(', ') : null,
+      cover_url: bookData.cover
+        ? bookData.cover.large || bookData.cover.medium || bookData.cover.small
+        : null,
     };
   } catch (error) {
-    console.error('Open Library API error:', error.message);
+    logger.error('Open Library API error: %s', error.message);
     return null;
   }
 }
@@ -83,7 +126,7 @@ async function fetchFromOpenLibrary(isbn) {
 async function fetchFromGoogleBooks(isbn) {
   try {
     const response = await axios.get(`https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}`, {
-      timeout: 5000
+      timeout: 5000,
     });
 
     if (!response.data.items || response.data.items.length === 0) {
@@ -97,10 +140,12 @@ async function fetchFromGoogleBooks(isbn) {
       author: bookInfo.authors ? bookInfo.authors.join(', ') : null,
       publisher: bookInfo.publisher || null,
       description: bookInfo.description || null,
-      cover_url: bookInfo.imageLinks ? (bookInfo.imageLinks.thumbnail || bookInfo.imageLinks.smallThumbnail) : null
+      cover_url: bookInfo.imageLinks
+        ? bookInfo.imageLinks.thumbnail || bookInfo.imageLinks.smallThumbnail
+        : null,
     };
   } catch (error) {
-    console.error('Google Books API error:', error.message);
+    logger.error('Google Books API error: %s', error.message);
     return null;
   }
 }
@@ -108,5 +153,5 @@ async function fetchFromGoogleBooks(isbn) {
 module.exports = {
   enrichBookData,
   fetchFromOpenLibrary,
-  fetchFromGoogleBooks
+  fetchFromGoogleBooks,
 };
