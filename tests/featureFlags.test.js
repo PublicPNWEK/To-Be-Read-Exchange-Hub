@@ -24,13 +24,15 @@ describe('FeatureFlags: percentage rollout', () => {
   });
 
   test('different users show distribution (non-deterministic check)', () => {
-    const samples = Array.from({ length: 100 }, (_, i) => featureFlags.isEnabled(FLAG_NAME, 'user-' + i));
+    const samples = Array.from({ length: 100 }, (_, i) =>
+      featureFlags.isEnabled(FLAG_NAME, 'user-' + i)
+    );
     const enabledCount = samples.filter(Boolean).length;
     // Expect roughly near 50 enabled; allow wide variance but ensure not extreme
     expect(enabledCount).toBeGreaterThan(20);
     expect(enabledCount).toBeLessThan(80);
   });
-  
+
   test('parseValue handles primitives and invalid gracefully', () => {
     featureFlags.setFlag('pv_true', featureFlags.parseValue('true'));
     featureFlags.setFlag('pv_false', featureFlags.parseValue('false'));

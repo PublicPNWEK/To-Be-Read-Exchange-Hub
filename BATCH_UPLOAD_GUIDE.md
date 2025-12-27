@@ -2,7 +2,8 @@
 
 ## 📚 To-Be-Read Exchange Hub - Batch Book Upload
 
-This guide will walk you through uploading large quantities of books using the batch upload feature, which includes automatic AI metadata enrichment and intelligent shelf placement.
+This guide will walk you through uploading large quantities of books using the batch upload feature,
+which includes automatic AI metadata enrichment and intelligent shelf placement.
 
 ---
 
@@ -23,9 +24,11 @@ This guide will walk you through uploading large quantities of books using the b
 
 ### Step 1: Prepare Your Data
 
-Create a CSV file with your book information. Minimum required: **one identifier** (ISBN, UPC, ASIN, or title).
+Create a CSV file with your book information. Minimum required: **one identifier** (ISBN, UPC, ASIN,
+or title).
 
 **Example:** `my-books.csv`
+
 ```csv
 isbn,title,author,condition,quantity
 9780743273565,The Great Gatsby,F. Scott Fitzgerald,Good,5
@@ -53,6 +56,7 @@ isbn,title,author,condition,quantity
 ### Required Columns
 
 At least **ONE** of the following:
+
 - `isbn` - ISBN-10 or ISBN-13 (with or without hyphens)
 - `upc` - Universal Product Code
 - `asin` - Amazon Standard Identification Number
@@ -60,20 +64,21 @@ At least **ONE** of the following:
 
 ### Optional Columns
 
-| Column | Description | Example | Max Length |
-|--------|-------------|---------|------------|
-| `author` | Author name | F. Scott Fitzgerald | 255 chars |
-| `publisher` | Publisher name | Scribner | 255 chars |
-| `condition` | Physical condition | Good, Like New, New | See below |
-| `quantity` | Number of copies | 5 | 1-1000 |
-| `description` | Book description | A classic American novel... | No limit |
-| `genre` | Book genre | Fiction, Non-Fiction | 100 chars |
-| `format` | Physical format | Hardcover, Paperback, eBook | 50 chars |
-| `shelf_location` | Manual shelf override | A-12 | 20 chars |
+| Column           | Description           | Example                     | Max Length |
+| ---------------- | --------------------- | --------------------------- | ---------- |
+| `author`         | Author name           | F. Scott Fitzgerald         | 255 chars  |
+| `publisher`      | Publisher name        | Scribner                    | 255 chars  |
+| `condition`      | Physical condition    | Good, Like New, New         | See below  |
+| `quantity`       | Number of copies      | 5                           | 1-1000     |
+| `description`    | Book description      | A classic American novel... | No limit   |
+| `genre`          | Book genre            | Fiction, Non-Fiction        | 100 chars  |
+| `format`         | Physical format       | Hardcover, Paperback, eBook | 50 chars   |
+| `shelf_location` | Manual shelf override | A-12                        | 20 chars   |
 
 ### Condition Values
 
 Must be **one of** (case-sensitive):
+
 - `New` - Brand new, never opened
 - `Like New` - Appears unread, perfect condition
 - `Very Good` - Minor wear, all pages intact
@@ -100,12 +105,14 @@ isbn,upc,asin,title,author,publisher,condition,quantity,description,genre,format
 ### Naming Conventions
 
 #### Option 1: Match by ISBN
+
 ```
 isbn_9780743273565.jpg
 isbn_9780061120084.png
 ```
 
 #### Option 2: Match by Row Number
+
 ```
 1.jpg     ← First book in CSV
 2.jpg     ← Second book in CSV
@@ -122,6 +129,7 @@ isbn_9780061120084.png
 ### AI Image Generation Fallback
 
 If no image is provided and `ENABLE_AI_IMAGE_GEN=true` in environment:
+
 - System automatically generates cover image using DALL-E 3
 - Prompt includes title, author, and genre
 - Generated images saved to uploads directory
@@ -146,6 +154,7 @@ When a book has incomplete metadata (missing title, author, genre, etc.), the sy
 ### Enrichment Status
 
 Track enrichment in batch status:
+
 - `enriched` - Count of books enriched by AI
 - `enrichment_status` - Per-book status (`pending`, `completed`, `failed`)
 - `enrichment_source` - Which AI provider was used
@@ -211,6 +220,7 @@ Monitor in real-time at `/api/batch/inventory/status`:
 ### Overflow Handling
 
 When a shelf reaches capacity:
+
 - System creates new shelf `OVERFLOW-01`, `OVERFLOW-02`, etc.
 - Capacity: 200 books per overflow shelf
 - Location notes: "Temporary overflow storage"
@@ -224,6 +234,7 @@ When a shelf reaches capacity:
 After upload, the UI automatically polls `/api/batch/{id}` every 2 seconds:
 
 **Progress Metrics:**
+
 - **Total Books** - Number uploaded
 - **Processed** - Books completed (success + failed)
 - **Successful** - Books successfully added to inventory
@@ -236,6 +247,7 @@ After upload, the UI automatically polls `/api/batch/{id}` every 2 seconds:
 ### Viewing Queue
 
 Click "View Incoming Queue" to see:
+
 - All books in current batch
 - Processing status per book (✅ completed, ⏳ pending, ❌ failed)
 - Shelf allocation
@@ -248,22 +260,27 @@ Click "View Incoming Queue" to see:
 ### Common Errors
 
 #### "Manifest file is required"
+
 **Cause:** No CSV/JSON file uploaded  
 **Solution:** Ensure you select a `.csv` or `.json` file
 
 #### "Batch too large (max 1000 books)"
+
 **Cause:** More than 1000 rows in CSV  
 **Solution:** Split into multiple batches of ≤1000 books each
 
 #### "Invalid ISBN format"
+
 **Cause:** ISBN doesn't pass checksum validation  
 **Solution:** Verify ISBN is correct, remove hyphens, ensure 10 or 13 digits
 
 #### "Row X: At least one identifier required"
+
 **Cause:** Row missing ISBN, UPC, ASIN, and title  
 **Solution:** Add at least one identifier to that row
 
 #### "File too large"
+
 **Cause:** File exceeds 10MB limit  
 **Solution:** Compress images or split into multiple uploads
 
@@ -325,18 +342,22 @@ Row 12: At least one identifier (ISBN/UPC/ASIN/title) required
 ### Endpoints
 
 **POST /api/batch/upload**
+
 - Upload CSV/JSON + images
 - Returns: `batch_id`, `total_books`
 
 **GET /api/batch/{id}**
+
 - Monitor batch progress
 - Returns: status, counts, errors
 
 **GET /api/batch/inventory/status**
+
 - View shelf capacities
 - Returns: all shelves with utilization
 
 **GET /api/batch/queue**
+
 - View incoming queue
 - Filters: `batch_id`, `status`, `limit`
 
