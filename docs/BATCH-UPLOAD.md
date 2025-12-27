@@ -1,10 +1,12 @@
 # 📦 Batch Book Upload System
 
-Enterprise-grade batch upload system with AI-powered enrichment, image handling, and intelligent shelf placement.
+Enterprise-grade batch upload system with AI-powered enrichment, image handling, and intelligent
+shelf placement.
 
 ## 🌟 Features
 
 ### Core Capabilities
+
 - **Multi-format Support**: CSV, JSON manifests
 - **Image Upload**: Attach cover images (matches by ISBN/UPC or row number)
 - **AI Enrichment**: Automatic metadata completion using OpenAI/Claude/Gemini
@@ -13,12 +15,14 @@ Enterprise-grade batch upload system with AI-powered enrichment, image handling,
 - **Error Handling**: Detailed error reporting with partial success support
 
 ### AI Integration
+
 - **Multi-provider Fallback**: Gemini → Claude → OpenAI (cheapest first)
 - **Cost Optimization**: Configurable provider order
 - **Image Generation**: Optional AI cover generation when none available (DALL-E)
 - **Metadata Fields**: Title, author, publisher, description, genre, pages, format
 
 ### Inventory Management
+
 - **Shelf Capacity Tracking**: Real-time space monitoring
 - **Overflow Handling**: Automatic overflow shelf creation
 - **Genre-based Placement**: Prefer shelves by genre when available
@@ -48,6 +52,7 @@ npm run db:init
 ```
 
 This creates new tables:
+
 - `shelf_capacity` - Tracks shelf utilization
 - `batch_uploads` - Batch processing metadata
 - `incoming_books` - Processing queue
@@ -73,17 +78,17 @@ isbn,upc,asin,title,author,condition,quantity,description,genre
 
 ### Field Descriptions
 
-| Field | Required | Description | Example |
-|-------|----------|-------------|---------|
-| `isbn` | One of ISBN/UPC/ASIN/title | ISBN-10 or ISBN-13 | `9780743273565` |
-| `upc` | One of ISBN/UPC/ASIN/title | Universal Product Code | `012345678901` |
-| `asin` | One of ISBN/UPC/ASIN/title | Amazon Standard ID | `B00XYZ12AB` |
-| `title` | If no ID provided | Book title | `The Great Gatsby` |
-| `author` | No | Author name(s) | `F. Scott Fitzgerald` |
-| `condition` | No (default: Good) | Book condition | `New`, `Like New`, `Good`, `Fair`, `Poor` |
-| `quantity` | Yes | Number of copies | `5` |
-| `description` | No | Full description | `A classic American novel...` |
-| `genre` | No | Primary genre | `Fiction`, `Mystery`, `Biography` |
+| Field         | Required                   | Description            | Example                                   |
+| ------------- | -------------------------- | ---------------------- | ----------------------------------------- |
+| `isbn`        | One of ISBN/UPC/ASIN/title | ISBN-10 or ISBN-13     | `9780743273565`                           |
+| `upc`         | One of ISBN/UPC/ASIN/title | Universal Product Code | `012345678901`                            |
+| `asin`        | One of ISBN/UPC/ASIN/title | Amazon Standard ID     | `B00XYZ12AB`                              |
+| `title`       | If no ID provided          | Book title             | `The Great Gatsby`                        |
+| `author`      | No                         | Author name(s)         | `F. Scott Fitzgerald`                     |
+| `condition`   | No (default: Good)         | Book condition         | `New`, `Like New`, `Good`, `Fair`, `Poor` |
+| `quantity`    | Yes                        | Number of copies       | `5`                                       |
+| `description` | No                         | Full description       | `A classic American novel...`             |
+| `genre`       | No                         | Primary genre          | `Fiction`, `Mystery`, `Biography`         |
 
 **Note**: If missing ISBN/UPC/ASIN, AI enrichment will use title + author to find metadata.
 
@@ -115,6 +120,7 @@ Match images to books using:
 Upload batch with manifest and images.
 
 **Request**:
+
 ```http
 POST /api/batch/upload
 Content-Type: multipart/form-data
@@ -134,6 +140,7 @@ Content-Type: image/jpeg
 ```
 
 **Response** (202 Accepted):
+
 ```json
 {
   "success": true,
@@ -158,6 +165,7 @@ Content-Type: image/jpeg
 Check batch processing status.
 
 **Response**:
+
 ```json
 {
   "success": true,
@@ -186,6 +194,7 @@ Check batch processing status.
 Get inventory health report.
 
 **Response**:
+
 ```json
 {
   "success": true,
@@ -215,11 +224,13 @@ Get inventory health report.
 View incoming book queue.
 
 **Query Parameters**:
+
 - `status`: Filter by status (`pending`, `processing`, `completed`, `failed`)
 - `batch_id`: Filter by batch ID
 - `limit`: Max results (default: 50)
 
 **Response**:
+
 ```json
 {
   "success": true,
@@ -262,16 +273,17 @@ View incoming book queue.
 Assuming 30% require AI enrichment:
 
 | Provider | Cost/1K tokens | Books Needing AI | Total Cost |
-|----------|----------------|------------------|------------|
-| Gemini | $0.0001 | 300 books | ~$0.03 |
-| Claude | $0.0008 | 300 books | ~$0.24 |
-| OpenAI | $0.0015 | 300 books | ~$0.45 |
+| -------- | -------------- | ---------------- | ---------- |
+| Gemini   | $0.0001        | 300 books        | ~$0.03     |
+| Claude   | $0.0008        | 300 books        | ~$0.24     |
+| OpenAI   | $0.0015        | 300 books        | ~$0.45     |
 
 **Recommendation**: Use Gemini as primary for maximum cost efficiency.
 
 ### AI-Enhanced Fields
 
 When traditional APIs fail, AI providers fill:
+
 - Title
 - Author
 - Publisher
@@ -310,17 +322,18 @@ When traditional APIs fail, AI providers fill:
 
 ### Common Errors
 
-| Error | Cause | Solution |
-|-------|-------|----------|
-| "At least one identifier required" | No ISBN/UPC/ASIN/title | Add at least one identifier |
-| "Invalid quantity" | Quantity < 1 or non-numeric | Use positive integer |
-| "Batch too large" | > 1000 books | Split into multiple batches |
-| "CSV parsing failed" | Malformed CSV | Check for quote escaping, encoding |
-| "AI enrichment failed" | All providers failed | Check API keys, network |
+| Error                              | Cause                       | Solution                           |
+| ---------------------------------- | --------------------------- | ---------------------------------- |
+| "At least one identifier required" | No ISBN/UPC/ASIN/title      | Add at least one identifier        |
+| "Invalid quantity"                 | Quantity < 1 or non-numeric | Use positive integer               |
+| "Batch too large"                  | > 1000 books                | Split into multiple batches        |
+| "CSV parsing failed"               | Malformed CSV               | Check for quote escaping, encoding |
+| "AI enrichment failed"             | All providers failed        | Check API keys, network            |
 
 ### Partial Success
 
 Batches support partial success:
+
 - Valid books are processed
 - Invalid books are logged with errors
 - Batch completes with mixed status

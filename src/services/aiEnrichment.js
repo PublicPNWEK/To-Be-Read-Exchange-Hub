@@ -13,11 +13,7 @@ const AI_PROVIDERS = {
 };
 
 // Default fallback chain (cheapest first)
-const DEFAULT_CHAIN = [
-  AI_PROVIDERS.GEMINI,
-  AI_PROVIDERS.CLAUDE,
-  AI_PROVIDERS.OPENAI,
-];
+const DEFAULT_CHAIN = [AI_PROVIDERS.GEMINI, AI_PROVIDERS.CLAUDE, AI_PROVIDERS.OPENAI];
 
 /**
  * Enrich book metadata using AI when traditional APIs fail
@@ -26,7 +22,7 @@ const DEFAULT_CHAIN = [
  */
 async function enrichWithAI(bookData) {
   const { isbn, upc, asin, title, author } = bookData;
-  
+
   // Build search context
   const identifiers = [
     isbn && `ISBN: ${isbn}`,
@@ -34,25 +30,27 @@ async function enrichWithAI(bookData) {
     asin && `ASIN: ${asin}`,
     title && `Title: "${title}"`,
     author && `Author: ${author}`,
-  ].filter(Boolean).join(', ');
+  ]
+    .filter(Boolean)
+    .join(', ');
 
   if (!identifiers) {
     throw new Error('No identifiers provided for AI enrichment');
   }
 
-  const chain = process.env.AI_PROVIDER_ORDER 
-    ? process.env.AI_PROVIDER_ORDER.split(',') 
+  const chain = process.env.AI_PROVIDER_ORDER
+    ? process.env.AI_PROVIDER_ORDER.split(',')
     : DEFAULT_CHAIN;
 
   let lastError;
-  
+
   for (const provider of chain) {
     if (!isProviderEnabled(provider)) continue;
 
     try {
       logger.info(`Attempting AI enrichment via ${provider} for: ${identifiers}`);
       const result = await callProvider(provider, identifiers);
-      
+
       if (result && result.title) {
         logger.info(`AI enrichment successful via ${provider}`);
         return {
@@ -67,7 +65,8 @@ async function enrichWithAI(bookData) {
     }
   }
 
-  throw lastError || new Error('All AI providers failed');
+  logger.warn('All AI providers failed', { lastError: lastError?.message });
+  return null;
 }
 
 /**
@@ -79,7 +78,7 @@ function isProviderEnabled(provider) {
     [AI_PROVIDERS.CLAUDE]: 'ANTHROPIC_API_KEY',
     [AI_PROVIDERS.GEMINI]: 'GEMINI_API_KEY',
   };
-  
+
   return Boolean(process.env[envKeys[provider]]);
 }
 
@@ -121,7 +120,7 @@ async function callOpenAI(identifiers) {
     },
     {
       headers: {
-        'Authorization': `Bearer ${apiKey}`,
+        Authorization: `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
       timeout: 15000,
@@ -146,9 +145,7 @@ async function callClaude(identifiers) {
     {
       model: process.env.CLAUDE_MODEL || 'claude-3-haiku-20240307',
       max_tokens: 500,
-      messages: [
-        { role: 'user', content: prompt },
-      ],
+      messages: [{ role: 'user', content: prompt }],
     },
     {
       headers: {
@@ -177,9 +174,11 @@ async function callGemini(identifiers) {
   const response = await axios.post(
     `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
     {
-      contents: [{
-        parts: [{ text: prompt }],
-      }],
+      contents: [
+        {
+          parts: [{ text: prompt }],
+        },
+      ],
       generationConfig: {
         temperature: 0.1,
         maxOutputTokens: 500,
@@ -223,12 +222,12 @@ function parseAIResponse(content) {
 
   // Strip markdown code blocks if present
   let cleaned = content.trim();
-  cleaned = cleaned.replace(/^```json\n?/i, '').replace(/\n?```$/,'');
+  cleaned = cleaned.replace(/^```json\n?/i, '').replace(/\n?```$/, '');
   cleaned = cleaned.replace(/^```\n?/, '').replace(/\n?```$/, '');
 
   try {
     const parsed = JSON.parse(cleaned);
-    
+
     // Validate required fields
     if (!parsed.title && !parsed.author) {
       throw new Error('AI response missing critical fields (title/author)');
@@ -254,7 +253,7 @@ function parseAIResponse(content) {
  */
 async function generateCoverImage(bookData) {
   const { title, author, genre } = bookData;
-  
+
   if (!process.env.OPENAI_API_KEY || process.env.DISABLE_AI_IMAGE_GEN === 'true') {
     return null;
   }
@@ -273,7 +272,7 @@ async function generateCoverImage(bookData) {
       },
       {
         headers: {
-          'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+          Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
           'Content-Type': 'application/json',
         },
         timeout: 30000,

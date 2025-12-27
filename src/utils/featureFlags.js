@@ -14,7 +14,7 @@ class FeatureFlags {
    */
   loadFromEnvironment() {
     const flagPrefix = 'FEATURE_FLAG_';
-    
+
     for (const [key, value] of Object.entries(process.env)) {
       if (key.startsWith(flagPrefix)) {
         const flagName = key.substring(flagPrefix.length).toLowerCase();
@@ -60,13 +60,13 @@ class FeatureFlags {
   parseValue(value) {
     if (value === 'true') return true;
     if (value === 'false') return false;
-    
+
     // Percentage rollout (0-100)
     const num = parseInt(value, 10);
     if (!isNaN(num) && num >= 0 && num <= 100) {
       return num;
     }
-    
+
     return false;
   }
 
@@ -83,16 +83,16 @@ class FeatureFlags {
    */
   isEnabled(flagName, identifier = null) {
     const flag = this.flags.get(flagName.toLowerCase());
-    
+
     if (flag === undefined) return false;
     if (typeof flag === 'boolean') return flag;
-    
+
     // Percentage rollout
     if (typeof flag === 'number' && identifier) {
       const hash = this.hashIdentifier(identifier);
       return hash <= flag;
     }
-    
+
     return false;
   }
 
@@ -103,7 +103,7 @@ class FeatureFlags {
   hashIdentifier(identifier) {
     let hash = 0;
     for (let i = 0; i < identifier.length; i++) {
-      hash = ((hash << 5) - hash) + identifier.charCodeAt(i);
+      hash = (hash << 5) - hash + identifier.charCodeAt(i);
       hash = hash & hash; // Convert to 32-bit integer
     }
     return Math.abs(hash) % 100;
