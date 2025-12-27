@@ -5,7 +5,6 @@ const {
   trackBookOperation,
   trackEnrichment,
   updateActiveConnections,
-  register,
 } = require('../src/middleware/observability');
 const express = require('express');
 const supertest = require('supertest');
