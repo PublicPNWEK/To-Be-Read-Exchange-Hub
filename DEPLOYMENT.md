@@ -2,7 +2,8 @@
 
 ## Overview
 
-The To-Be-Read Exchange Hub now features a **zero-configuration, single-download deployment system** that automates the entire setup process.
+The To-Be-Read Exchange Hub now features a **zero-configuration, single-download deployment system**
+that automates the entire setup process.
 
 ## Quick Start (3 Steps)
 
@@ -37,6 +38,7 @@ http://localhost:3000
 ```
 
 That's it! The deployment script handles:
+
 - ✅ System requirements validation
 - ✅ Dependency installation
 - ✅ Environment configuration
@@ -47,6 +49,7 @@ That's it! The deployment script handles:
 ## What's Included
 
 ### Complete Application Bundle
+
 - **Source Code**: All application files ready to run
 - **Dependencies**: Full package.json with production dependencies
 - **Database Schema**: PostgreSQL schema and migrations
@@ -56,6 +59,7 @@ That's it! The deployment script handles:
 - **Deployment Scripts**: Automated setup and startup scripts
 
 ### Pre-Configured Services
+
 - **Systemd Service**: Production-ready service definition
 - **PM2 Configuration**: Process manager setup
 - **Docker Support**: docker-compose.yml included
@@ -70,6 +74,7 @@ That's it! The deployment script handles:
 ```
 
 The script will interactively guide you through:
+
 1. System requirements check
 2. Dependency installation
 3. Environment configuration
@@ -191,6 +196,7 @@ curl http://localhost:3000/health
 ```
 
 Expected response:
+
 ```json
 {
   "status": "ok",
@@ -229,6 +235,7 @@ npm run create-admin
 ```
 
 Or manually:
+
 ```bash
 node scripts/create-admin.js
 ```
@@ -274,6 +281,7 @@ tail -f /var/log/nginx/access.log
 ### Metrics
 
 Prometheus metrics available at:
+
 ```
 http://localhost:3000/metrics
 ```
@@ -413,6 +421,7 @@ location ~* \.(jpg|jpeg|png|gif|ico|css|js)$ {
 ## Support
 
 ### Resources
+
 - **Installation Guide**: `INSTALL.md`
 - **Quick Start**: `QUICKSTART.md`
 - **Batch Upload**: `BATCH_UPLOAD_GUIDE.md`
@@ -420,6 +429,7 @@ location ~* \.(jpg|jpeg|png|gif|ico|css|js)$ {
 - **API Documentation**: http://localhost:3000/api-docs
 
 ### Getting Help
+
 - **GitHub Issues**: https://github.com/PNW-E/To-Be-Read-Exchange-Hub/issues
 - **Documentation**: See `docs/` folder
 - **Examples**: See `tests/` for code examples

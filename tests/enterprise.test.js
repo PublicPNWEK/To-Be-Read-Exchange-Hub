@@ -6,7 +6,12 @@ const express = require('express');
 
 // Import enterprise modules (unit-level)
 const { securityHeaders, apiKeyAuth, sanitizeInput } = require('../src/middleware/security');
-const { correlationId, metricsMiddleware, metricsEndpoint, register } = require('../src/middleware/observability');
+const {
+  correlationId,
+  metricsMiddleware,
+  metricsEndpoint,
+  register,
+} = require('../src/middleware/observability');
 const featureFlags = require('../src/utils/featureFlags');
 const { sloMonitor } = require('../src/utils/sloMonitor');
 // Override global mock to test real graceful shutdown behavior in this suite
@@ -23,7 +28,12 @@ delete process.env.API_KEYS;
 const fullApp = require('../src/server');
 
 // Helper: build a minimal app to isolate certain middleware logic
-function buildMiniApp({ enableApiKey = false, apiKeys = 'test-key', includeSanitize = false, includeFeatureEndpoints = false } = {}) {
+function buildMiniApp({
+  enableApiKey = false,
+  apiKeys = 'test-key',
+  includeSanitize = false,
+  includeFeatureEndpoints = false,
+} = {}) {
   if (enableApiKey) {
     process.env.API_KEY_ENABLED = 'true';
     process.env.API_KEYS = apiKeys;
@@ -69,9 +79,9 @@ describe('Enterprise: Security Headers', () => {
       'x-frame-options',
       'x-content-type-options',
       'strict-transport-security',
-      'referrer-policy'
+      'referrer-policy',
     ];
-    expect(keys.some(k => securityCandidates.includes(k))).toBe(true);
+    expect(keys.some((k) => securityCandidates.includes(k))).toBe(true);
   });
 });
 
@@ -134,7 +144,9 @@ describe('Enterprise: Service Level Objectives', () => {
     const res = await request(fullApp).get('/api/slo');
     expect(res.status).toBe(200);
     if (!res.body.summary) {
-      throw new Error(`SLO summary missing. Body keys: ${Object.keys(res.body)} Body: ${JSON.stringify(res.body)}`);
+      throw new Error(
+        `SLO summary missing. Body keys: ${Object.keys(res.body)} Body: ${JSON.stringify(res.body)}`
+      );
     }
     expect(res.body.summary.totalRequests).toBeGreaterThanOrEqual(1);
   });
@@ -171,7 +183,9 @@ describe('Enterprise: Graceful Shutdown indicator', () => {
     const fakePool = { end: async () => {} };
     const gs = new GracefulShutdown(fakeServer, fakePool);
     const middleware = gs.healthCheckMiddleware();
-    const req = {}; const res = { status: () => ({ json: () => {} }) }; const next = () => {};
+    const req = {};
+    const res = { status: () => ({ json: () => {} }) };
+    const next = () => {};
     expect(() => middleware(req, res, next)).not.toThrow();
   });
   test('health middleware returns 503 when shutting down', async () => {
