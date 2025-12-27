@@ -22,7 +22,7 @@ describe('GracefulShutdown signal handler', () => {
     expect(gs.isShuttingDown()).toBe(false);
     process.emit('SIGTERM');
     // Allow microtasks to flush
-    await new Promise(r => setTimeout(r, 10));
+    await new Promise((r) => setTimeout(r, 10));
     expect(gs.isShuttingDown()).toBe(true);
     // process.exit should not be called due to NODE_ENV==='test'
     expect(process.exit).not.toHaveBeenCalled();

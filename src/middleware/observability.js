@@ -50,10 +50,10 @@ const correlationId = (req, res, next) => {
   const requestId = req.headers['x-request-id'] || uuidv4();
   req.id = requestId;
   res.setHeader('X-Request-ID', requestId);
-  
+
   // Add to logger context
   req.log = logger.child({ requestId });
-  
+
   next();
 };
 
@@ -76,22 +76,27 @@ const metricsMiddleware = responseTime((req, res, time) => {
   // Track errors
   if (res.statusCode >= 400) {
     const errorType = res.statusCode >= 500 ? 'server_error' : 'client_error';
-    httpRequestErrors.labels({
-      method: req.method,
-      route,
-      error_type: errorType,
-    }).inc();
+    httpRequestErrors
+      .labels({
+        method: req.method,
+        route,
+        error_type: errorType,
+      })
+      .inc();
   }
 
   // Structured logging
-  req.log.info({
-    method: req.method,
-    path: req.path,
-    statusCode: res.statusCode,
-    duration: time,
-    userAgent: req.headers['user-agent'],
-    ip: req.ip,
-  }, 'HTTP Request completed');
+  req.log.info(
+    {
+      method: req.method,
+      path: req.path,
+      statusCode: res.statusCode,
+      duration: time,
+      userAgent: req.headers['user-agent'],
+      ip: req.ip,
+    },
+    'HTTP Request completed'
+  );
 });
 
 /**

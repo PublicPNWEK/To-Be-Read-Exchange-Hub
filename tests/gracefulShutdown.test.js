@@ -32,7 +32,9 @@ describe('GracefulShutdown', () => {
     // Capture connection handler
     const handlers = {};
     const fakeServer = {
-      on: (evt, cb) => { handlers[evt] = cb; },
+      on: (evt, cb) => {
+        handlers[evt] = cb;
+      },
       close: (cb) => cb && cb(),
       keepAliveTimeout: 0,
       headersTimeout: 0,
@@ -40,7 +42,16 @@ describe('GracefulShutdown', () => {
     const fakePool = { end: jest.fn().mockResolvedValue() };
     const gs = new GracefulShutdown(fakeServer, fakePool, { timeout: 200 });
     // Simulate two connections
-    const mkConn = () => ({ destroyed: false, end: jest.fn(), destroy: jest.fn(), on: jest.fn((e, cb)=>{ if(e==='close'){ /* allow manual close */ } }) });
+    const mkConn = () => ({
+      destroyed: false,
+      end: jest.fn(),
+      destroy: jest.fn(),
+      on: jest.fn((e, cb) => {
+        if (e === 'close') {
+          /* allow manual close */
+        }
+      }),
+    });
     const c1 = mkConn();
     const c2 = mkConn();
     handlers.connection && handlers.connection(c1);
