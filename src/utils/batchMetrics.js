@@ -87,7 +87,7 @@ class BatchMetrics {
    */
   recordBookProcessed(success) {
     this.metrics.books.queued = Math.max(0, this.metrics.books.queued - 1);
-    
+
     if (success) {
       this.metrics.books.successful++;
     } else {
@@ -207,7 +207,7 @@ class BatchMetrics {
 
     lines.push('# HELP batch_uploads_by_status Batch uploads by status');
     lines.push('# TYPE batch_uploads_by_status gauge');
-    ['pending', 'processing', 'completed', 'failed'].forEach(status => {
+    ['pending', 'processing', 'completed', 'failed'].forEach((status) => {
       lines.push(`batch_uploads_by_status{status="${status}"} ${m.batches[status]}`);
     });
 
@@ -223,15 +223,14 @@ class BatchMetrics {
     // Enrichment metrics
     lines.push('# HELP enrichment_api_calls_total Total AI API calls');
     lines.push('# TYPE enrichment_api_calls_total counter');
-    ['gemini', 'claude', 'openai'].forEach(provider => {
+    ['gemini', 'claude', 'openai'].forEach((provider) => {
       lines.push(`enrichment_api_calls_total{provider="${provider}"} ${m.enrichment[provider]}`);
     });
 
     lines.push('# HELP enrichment_success_rate Enrichment success rate');
     lines.push('# TYPE enrichment_success_rate gauge');
-    const successRate = m.enrichment.totalCalls > 0
-      ? m.enrichment.success / m.enrichment.totalCalls
-      : 0;
+    const successRate =
+      m.enrichment.totalCalls > 0 ? m.enrichment.success / m.enrichment.totalCalls : 0;
     lines.push(`enrichment_success_rate ${successRate.toFixed(4)}`);
 
     lines.push('# HELP enrichment_cost_total Total enrichment cost in USD');

@@ -15,6 +15,7 @@ wget -qO- https://raw.githubusercontent.com/PNW-E/To-Be-Read-Exchange-Hub/main/w
 ```
 
 That's it! The installer will:
+
 - ✅ Download the latest release
 - ✅ Extract to `~/bookexchange`
 - ✅ Install all dependencies
@@ -60,6 +61,7 @@ curl http://localhost:3000/health
 ## Zero-Configuration Features
 
 The installer automatically:
+
 - 🔍 Detects your operating system
 - 🔧 Installs missing dependencies
 - 🗄️ Sets up PostgreSQL (local or Docker)
@@ -111,16 +113,19 @@ rm -rf bookexchange
 ## Troubleshooting
 
 **Permission denied:**
+
 ```bash
 sudo bash -c "$(curl -fsSL https://raw.githubusercontent.com/PNW-E/To-Be-Read-Exchange-Hub/main/web-install.sh)"
 ```
 
 **Port already in use:**
+
 ```bash
 PORT=8080 ./start.sh
 ```
 
 **Database connection failed:**
+
 ```bash
 # Use Docker Postgres
 docker-compose up -d db

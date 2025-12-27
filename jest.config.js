@@ -22,18 +22,16 @@ module.exports = {
   setupFilesAfterEnv: ['<rootDir>/tests/jest.setup.js'],
   transform: {
     // Handle ESM modules like uuid which ship "export" syntax
-    '^.+\\.[jt]sx?$': 'babel-jest'
+    '^.+\\.[jt]sx?$': 'babel-jest',
   },
-  transformIgnorePatterns: [
-    '/node_modules/(?!uuid/)'
-  ],
+  transformIgnorePatterns: ['/node_modules/(?!uuid/)'],
   // Performance optimizations
   maxWorkers: '75%',
   maxConcurrency: 5,
   testTimeout: 10000,
   cache: true,
   cacheDirectory: '<rootDir>/.jest-cache',
-  
+
   // Performance optimizations
   maxWorkers: '75%',
   maxConcurrency: 5,

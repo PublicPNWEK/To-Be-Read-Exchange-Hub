@@ -36,14 +36,14 @@ const SLO_DEFINITIONS = {
     period: '30d',
     description: '3-nines availability',
   },
-  
+
   // 95% of requests under 200ms, 99% under 1s
   latency: {
     p95: 200, // milliseconds
     p99: 1000,
     description: 'Fast response times',
   },
-  
+
   // Error rate under 0.1%
   errorRate: {
     target: 0.1,
@@ -59,7 +59,7 @@ class SLOMonitor {
       errors: [],
       lastReset: Date.now(),
     };
-    
+
     this.WINDOW_SIZE = 30 * 24 * 60 * 60 * 1000; // 30 days
   }
 
@@ -86,7 +86,7 @@ class SLOMonitor {
 
     // Clean old data
     this.cleanOldData();
-    
+
     // Update Prometheus metrics
     this.updateMetrics();
   }
@@ -96,30 +96,26 @@ class SLOMonitor {
    */
   cleanOldData() {
     const cutoff = Date.now() - this.WINDOW_SIZE;
-    
-    this.metrics.latencies = this.metrics.latencies.filter(
-      item => item.timestamp > cutoff
-    );
-    
-    this.metrics.errors = this.metrics.errors.filter(
-      item => item.timestamp > cutoff
-    );
+
+    this.metrics.latencies = this.metrics.latencies.filter((item) => item.timestamp > cutoff);
+
+    this.metrics.errors = this.metrics.errors.filter((item) => item.timestamp > cutoff);
   }
 
   /**
    * Calculate current availability
    */
   calculateAvailability() {
-  if (this.metrics.requests.total === 0) return 100;
-  return (this.metrics.requests.success / this.metrics.requests.total) * 100;
+    if (this.metrics.requests.total === 0) return 100;
+    return (this.metrics.requests.success / this.metrics.requests.total) * 100;
   }
 
   /**
    * Calculate error rate
    */
   calculateErrorRate() {
-  if (this.metrics.requests.total === 0) return 0;
-  return (this.metrics.errors.length / this.metrics.requests.total) * 100;
+    if (this.metrics.requests.total === 0) return 0;
+    return (this.metrics.errors.length / this.metrics.requests.total) * 100;
   }
 
   /**
@@ -127,7 +123,7 @@ class SLOMonitor {
    */
   calculatePercentile(percentile) {
     if (this.metrics.latencies.length === 0) return 0;
-    const sorted = this.metrics.latencies.map(item => item.value).sort((a, b) => a - b);
+    const sorted = this.metrics.latencies.map((item) => item.value).sort((a, b) => a - b);
     const index = Math.ceil((percentile / 100) * sorted.length) - 1;
     return sorted[index];
   }
@@ -137,7 +133,7 @@ class SLOMonitor {
    */
   calculateErrorBudget() {
     const targetAvailability = SLO_DEFINITIONS.availability.target;
-    const allowedErrors = (100 - targetAvailability) * this.metrics.requests.total / 100;
+    const allowedErrors = ((100 - targetAvailability) * this.metrics.requests.total) / 100;
     const actualErrors = this.metrics.errors.length;
     if (allowedErrors === 0) return 100; // No traffic yet => full budget remaining
     return Math.max(0, ((allowedErrors - actualErrors) / allowedErrors) * 100);
