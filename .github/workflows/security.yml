@@ -27,19 +27,19 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@v3
+        uses: github/codeql-action/init@v4
         with:
           languages: ${{ matrix.language }}
           queries: security-extended,security-and-quality
 
       - name: Autobuild
-        uses: github/codeql-action/autobuild@v3
+        uses: github/codeql-action/autobuild@v4
 
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v3
+        uses: github/codeql-action/analyze@v4
         with:
           category: '/language:${{matrix.language}}'
 
@@ -50,10 +50,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: '20.x'
 
@@ -71,7 +71,7 @@ jobs:
 
       - name: Upload audit report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: security-audit-report
           path: audit-report.json
@@ -84,7 +84,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Run OWASP Dependency Check
         uses: dependency-check/Dependency-Check_Action@main
@@ -95,7 +95,7 @@ jobs:
 
       - name: Upload OWASP report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: owasp-dependency-check-report
           path: reports/
@@ -108,7 +108,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
@@ -127,6 +127,26 @@ jobs:
         with:
           path: ./
           extra_args: --debug --only-verified
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        
+    - name: TruffleHog - Scan recent commits
+      if: github.event_name == 'push' || github.event_name == 'pull_request'
+      uses: trufflesecurity/trufflehog@main
+      with:
+        path: ./
+        base: ${{ github.event.before }}
+        head: ${{ github.event.after }}
+        extra_args: --debug --only-verified
+
+    - name: TruffleHog - Scan entire history
+      if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+      uses: trufflesecurity/trufflehog@main
+      with:
+        path: ./
+        extra_args: --debug --only-verified
 
   # Job 5: Container Security (if using Docker)
   trivy-scan:
@@ -136,7 +156,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
@@ -148,7 +168,7 @@ jobs:
           severity: 'CRITICAL,HIGH'
 
       - name: Upload Trivy results to GitHub Security
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         if: always()
         with:
           sarif_file: 'trivy-results.sarif'
