@@ -50,6 +50,7 @@ Full walkthrough: [QUICKSTART.md](QUICKSTART.md)
 - Smart inventory placement & bulk import (CSV/JSON)
 - Automatic enrichment (Open Library / Google Books)
 - Robust REST API + interactive Swagger docs
+- **📱 Android Mobile App** with optimized builds
 - Resilience: circuit breaker, rate limiting, graceful shutdown
 - Observability: Prometheus metrics, correlation IDs, structured logs, SLO endpoint
 - Security: hardened headers (Helmet), API key layer, deep sanitization
@@ -113,6 +114,24 @@ Swagger UI at `/api-docs` (live schemas + try-it). Prometheus metrics at `/metri
 ## 🧱 Database Shape (High Level)
 
 `books`, `users`, `roles`, `permissions`, mapping tables, sync log. See `schema.sql` for details.
+
+## 📱 Mobile App (Android)
+
+A React Native mobile app is available in the `/mobile` directory with:
+
+- 📚 Real-time book inventory viewing
+- 🔄 Pull-to-refresh functionality
+- ⚡ Optimized Android builds (Hermes, ProGuard, APK splitting)
+- 🎨 Modern UI with Material Design
+
+**Quick Start:**
+```bash
+cd mobile
+npm install
+npm run android
+```
+
+See [`mobile/README.md`](mobile/README.md) for detailed setup and build instructions.
 
 ## 🤝 Contribute
 
